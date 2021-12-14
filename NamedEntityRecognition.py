@@ -17,12 +17,13 @@
 import requests
 import json 
 import re
+import os 
 
 # This class is obliged to use Stanford CoreNLP to get the NER and range representation of numbers
 class NamedEntityRecognition():
        
     def __init__(self):
-        self.url = "http://192.168.33.10:9000"        
+        self.url = "http://" + os.environ["CORENLP_HOST"] + ":9000"        
         self.headers = {'content-type': 'text/plain'}
 
     def getNerAndSpanExpression(self, sentence):
