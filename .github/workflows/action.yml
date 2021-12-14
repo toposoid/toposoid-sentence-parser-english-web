@@ -22,7 +22,7 @@ jobs:
         run: |
             docker build --build-arg TARGET_BRANCH=${{ env.PJ_BRANCH }} --tag ${{ env.PJ_REPO }}:${{ env.PJ_VERSION }} -f Dockerfile-workflow .
             docker-compose -f docker-compose-workflow.yml up -d
-            docker-compose -f docker-compose-workflow.yml exec -T ${{ env.PJ_REPO }} bash -c "cd ${{ env.PJ_REPO }} && pytest"
+            docker-compose -f docker-compose-workflow.yml exec -T ${{ env.PJ_REPO }} sh -c "cd ${{ env.PJ_REPO }} && pytest"
       - name: Docker meta
         id: docker_meta
         uses: crazy-max/ghaction-docker-meta@v1
