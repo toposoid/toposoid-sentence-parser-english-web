@@ -20,11 +20,11 @@ from SentenceParser import SentenceParser
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from starlette.middleware.cors import CORSMiddleware
-import traceback
 from logging import config
 config.fileConfig('logging.conf')
-LOG = logging.getLogger(__name__)
 import logging
+LOG = logging.getLogger(__name__)
+import traceback
 
 
 app = FastAPI(
