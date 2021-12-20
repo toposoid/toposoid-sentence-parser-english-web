@@ -42,9 +42,9 @@ app.add_middleware(
 )
 # This API isfor building KnoledgeBase
 @app.post("/analyzeOneSentence")
-def analyzeOneSentence(knoledge:Knowledge):
+def analyzeOneSentence(knowledge:Knowledge):
     try:
-        aso = parser.parse(knoledge.sentence, "-1")
+        aso = parser.parse(knowledge.sentence, "-1", knowledge.lang)
         return JSONResponse(content=jsonable_encoder(aso))
     except Exception as e:
         LOG.error(traceback.format_exc())
@@ -55,10 +55,10 @@ def analyzeOneSentence(knoledge:Knowledge):
 def analyze(inputSentence:InputSentence):
     try:
         asos = []
-        for sentence in inputSentence.premise:
-            asos.append(parser.parse(sentence, 0))
-        for sentence in inputSentence.claim:
-            asos.append(parser.parse(sentence, 1))
+        for knowledge in inputSentence.premise:
+            asos.append(parser.parse(knowledge.sentence, 0, knowledge.lang))
+        for knowledge in inputSentence.claim:
+            asos.append(parser.parse(knowledge.sentence, 1, knowledge.lang))
         return JSONResponse(content=jsonable_encoder(AnalyzedSentenceObjects(analyzedSentenceObjects = asos)))
     except Exception as e:
         LOG.error(traceback.format_exc())
