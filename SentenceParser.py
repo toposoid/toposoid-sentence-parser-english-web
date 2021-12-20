@@ -55,7 +55,7 @@ class SentenceParser():
         return result
 
     # main function
-    def parse(self, sentence, sentenceType):
+    def parse(self, sentence, sentenceType, lang):
         doc = self.nlp(sentence)
         extractInfo = self.extractPreInfo(doc)    
         nodeMap = {}
@@ -104,6 +104,7 @@ class SentenceParser():
                 modalityType =  "-",
                 logicType = "-",
                 nodeType = nodeType,
+                lang = lang,
                 extentText ="{}"
             )
             nodeMap[propositionId + "-" + str(token.i)] = node
@@ -114,7 +115,8 @@ class SentenceParser():
                     destinationId = propositionId + "-" + str(token.i),
                     caseStr = token.dep_,
                     dependType = "-",
-                    logicType = "-"
+                    logicType = "-",
+                    lang = lang
                 ))
             
         defaultDeductionResult = DeductionResult(status=False,matchedPropositionIds=[], deductionUnit="")
