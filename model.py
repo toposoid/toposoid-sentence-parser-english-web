@@ -57,7 +57,7 @@ class KnowledgeBaseNode(BaseModel):
     surfaceYomi:str
     modalityType:str
     logicType:str
-    nodeType:str
+    nodeType:int
     lang:str
     extentText:str  
 
