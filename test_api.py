@@ -85,7 +85,7 @@ def test_SimpleSentenceWithConditionalClauses():
     sentence = " ".join(surfaces).replace(" .", ".").replace(" ,", ",")
     assert sentence == "If you heat ice, it melts."
     assert caseTypes == ['mark', 'nsubj', 'advcl', 'dobj', 'punct', 'nsubj', 'ROOT', 'punct']
-    assert nodeTypes ==  ['0', '0', '0', '0', '1', '1', '1', '1']
+    assert nodeTypes ==  [0, 0, 0, 0, 1, 1, 1, 1]
     
 def test_SimpleSentenceWithConditionalClauses2():
     response = client.post("/analyzeOneSentence",
@@ -104,7 +104,7 @@ def test_SimpleSentenceWithConditionalClauses2():
     sentence = " ".join(surfaces).replace(" .", ".").replace(" ,", ",")
     assert sentence == "If you heat ice it melts."
     assert caseTypes == ['mark', 'nsubj', 'ROOT', 'dobj', 'nsubj', 'relcl', 'punct']
-    assert nodeTypes ==  ['0', '0', '0', '0', '1', '1', '0']
+    assert nodeTypes ==  [0, 0, 0, 0, 1, 1, 0]
 
 def test_SimpleSentenceWithConditionalClauses3():
     response = client.post("/analyzeOneSentence",
@@ -123,7 +123,7 @@ def test_SimpleSentenceWithConditionalClauses3():
     sentence = " ".join(surfaces).replace(" .", ".").replace(" ,", ",")
     assert sentence == "I did n't bring an umbrella, as the wind is so strong today."
     assert caseTypes == ['nsubj', 'aux', 'neg', 'ROOT', 'det', 'dobj', 'punct', 'mark', 'det', 'nsubj', 'advcl', 'advmod', 'acomp', 'npadvmod', 'punct']
-    assert nodeTypes ==  ['1', '1', '1', '1', '1', '1', '1', '0', '0', '0', '0', '0', '0', '0', '1']
+    assert nodeTypes ==  [1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1]
     
 def test_SimpleSentenceWithQuantitativeExpressions():
     response = client.post("/analyzeOneSentence",
