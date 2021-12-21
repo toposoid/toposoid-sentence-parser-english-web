@@ -111,8 +111,8 @@ class SentenceParser():
             
             if token.i != token.head.i:
                 edgeList.append(KnowledgeBaseEdge(
-                    sourceId = propositionId + "-" + str(token.head.i),
-                    destinationId = propositionId + "-" + str(token.i),
+                    sourceId = propositionId + "-" + str(token.i),
+                    destinationId = propositionId + "-" + str(token.head.i),
                     caseStr = token.dep_,
                     dependType = "-",
                     logicType = "-",
