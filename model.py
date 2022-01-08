@@ -23,6 +23,7 @@ com.ideal.linked.toposoid.knowledgebase.regist.model
 '''
 class Knowledge(BaseModel):
     sentence:str
+    lang:str
     extentInfoJson:str
 
 '''
@@ -30,8 +31,8 @@ ref. https://github.com/toposoid/toposoid-deduction-protocol-model
 com.ideal.linked.toposoid.protocol.model.parser
 '''
 class InputSentence(BaseModel):
-    premise:List[str] 
-    claim:List[str]
+    premise:List[Knowledge] 
+    claim:List[Knowledge]
 '''
 ref. https://github.com/toposoid/toposoid-knowledgebase-model
 com.ideal.linked.toposoid.knowledgebase.model
@@ -56,7 +57,8 @@ class KnowledgeBaseNode(BaseModel):
     surfaceYomi:str
     modalityType:str
     logicType:str
-    nodeType:str
+    nodeType:int
+    lang:str
     extentText:str  
 
 '''
@@ -69,6 +71,7 @@ class KnowledgeBaseEdge(BaseModel):
     caseStr:str
     dependType:str
     logicType:str
+    lang:str
 
 '''
 ref. https://github.com/toposoid/toposoid-deduction-protocol-model

@@ -55,7 +55,7 @@ class SentenceParser():
         return result
 
     # main function
-    def parse(self, sentence, sentenceType):
+    def parse(self, sentence, sentenceType, lang):
         doc = self.nlp(sentence)
         extractInfo = self.extractPreInfo(doc)    
         nodeMap = {}
@@ -104,17 +104,19 @@ class SentenceParser():
                 modalityType =  "-",
                 logicType = "-",
                 nodeType = nodeType,
+                lang = lang,
                 extentText ="{}"
             )
             nodeMap[propositionId + "-" + str(token.i)] = node
             
             if token.i != token.head.i:
                 edgeList.append(KnowledgeBaseEdge(
-                    sourceId = propositionId + "-" + str(token.head.i),
-                    destinationId = propositionId + "-" + str(token.i),
+                    sourceId = propositionId + "-" + str(token.i),
+                    destinationId = propositionId + "-" + str(token.head.i),
                     caseStr = token.dep_,
                     dependType = "-",
-                    logicType = "-"
+                    logicType = "-",
+                    lang = lang
                 ))
             
         defaultDeductionResult = DeductionResult(status=False,matchedPropositionIds=[], deductionUnit="")

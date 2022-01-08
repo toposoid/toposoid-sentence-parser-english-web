@@ -20,6 +20,11 @@ from SentenceParser import SentenceParser
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from starlette.middleware.cors import CORSMiddleware
+from logging import config
+config.fileConfig('logging.conf')
+import logging
+LOG = logging.getLogger(__name__)
+import traceback
 
 
 app = FastAPI(
@@ -37,17 +42,26 @@ app.add_middleware(
 )
 # This API isfor building KnoledgeBase
 @app.post("/analyzeOneSentence")
-def analyzeOneSentence(knoledge:Knowledge):
-    aso = parser.parse(knoledge.sentence, "-1")
-    return JSONResponse(content=jsonable_encoder(aso))
+def analyzeOneSentence(knowledge:Knowledge):
+    try:
+        aso = parser.parse(knowledge.sentence, "-1", knowledge.lang)
+        return JSONResponse(content=jsonable_encoder(aso))
+    except Exception as e:
+        LOG.error(traceback.format_exc())
+        return JSONResponse({"status": "ERROR", "message": traceback.format_exc()})
 
 #This API is for inference
 @app.post("/analyze")
 def analyze(inputSentence:InputSentence):
-    asos = []
-    for sentence in inputSentence.premise:
-        asos.append(parser.parse(sentence, 0))
-    for sentence in inputSentence.claim:
-        asos.append(parser.parse(sentence, 1))
-    return JSONResponse(content=jsonable_encoder(AnalyzedSentenceObjects(analyzedSentenceObjects = asos)))
+    try:
+        asos = []
+        for knowledge in inputSentence.premise:
+            asos.append(parser.parse(knowledge.sentence, 0, knowledge.lang))
+        for knowledge in inputSentence.claim:
+            asos.append(parser.parse(knowledge.sentence, 1, knowledge.lang))
+        return JSONResponse(content=jsonable_encoder(AnalyzedSentenceObjects(analyzedSentenceObjects = asos)))
+    except Exception as e:
+        LOG.error(traceback.format_exc())
+        return JSONResponse({"status": "ERROR", "message": traceback.format_exc()})
+
     
