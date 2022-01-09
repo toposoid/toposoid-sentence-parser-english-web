@@ -25,6 +25,7 @@ It takes more than 20 minutes to pull the Docker image for the first time.
 ```bash
 curl -X POST -H "Content-Type: application/json" -d '{
     "sentence":"The answer is blown'\''in the wind.", 
+    "lang":"en_US", 
     "extentInfoJson":"{}"
 }
 ' http://localhost:9007/analyzeOneSentence
