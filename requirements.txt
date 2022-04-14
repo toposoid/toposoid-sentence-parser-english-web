@@ -6,3 +6,4 @@ wheel==0.37.0
 spacy==3.2.0
 spacy-legacy==3.0.8
 spacy-loggers==1.0.1
+blis==0.7.5
