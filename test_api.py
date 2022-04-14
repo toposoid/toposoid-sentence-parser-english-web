@@ -26,7 +26,7 @@ def test_EmptySentence():
     try:
         response = client.post("/analyzeOneSentence",
                             headers={"Content-Type": "application/json"},
-                            json={"sentence": "", "lang":"en_US", "extentInfoJson": "{}"})    
+                            json={"sentence": "", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False})    
         assert response.status_code == 200
         aso = AnalyzedSentenceObject.parse_obj(response.json())        
     except Exception:
@@ -35,7 +35,7 @@ def test_EmptySentence():
 def test_BasicSimpleSentence():
     response = client.post("/analyzeOneSentence",
                         headers={"Content-Type": "application/json"},
-                        json={"sentence": "This is a simple test.", "lang":"en_US", "extentInfoJson": "{}"})    
+                        json={"sentence": "This is a simple test.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False})    
     assert response.status_code == 200
     aso = AnalyzedSentenceObject.parse_obj(response.json())
     scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.currentId)
@@ -51,7 +51,7 @@ def test_BasicSimpleSentence():
 def test_NegativeSimpleSentence():
     response = client.post("/analyzeOneSentence",
                             headers={"Content-Type": "application/json"},
-                            json={"sentence": "The problem does not seem soluble.", "lang":"en_US", "extentInfoJson": "{}"})    
+                            json={"sentence": "The problem does not seem soluble.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False})    
     assert response.status_code == 200
     aso = AnalyzedSentenceObject.parse_obj(response.json())
     scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.currentId)
@@ -61,7 +61,7 @@ def test_NegativeSimpleSentence():
     for i, x in enumerate(scoresSorted):
         surfaces.append(x.surface)
         caseTypes.append(x.caseType)
-        if x.isDenial: denialIndex  = i
+        if x.isDenialWord: denialIndex  = i
     sentence = " ".join(surfaces).replace(" .", ".")
     assert sentence == "The problem does not seem soluble."
     assert caseTypes == ['det', 'nsubj', 'aux', 'neg', 'ROOT', 'oprd', 'punct']
@@ -71,7 +71,7 @@ def test_NegativeSimpleSentence():
 def test_SimpleSentenceWithConditionalClauses():
     response = client.post("/analyzeOneSentence",
                         headers={"Content-Type": "application/json"},
-                        json={"sentence": "If you heat ice, it melts.", "lang":"en_US", "extentInfoJson": "{}"})    
+                        json={"sentence": "If you heat ice, it melts.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False})    
     assert response.status_code == 200
     aso = AnalyzedSentenceObject.parse_obj(response.json())
     scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.currentId)
@@ -90,7 +90,7 @@ def test_SimpleSentenceWithConditionalClauses():
 def test_SimpleSentenceWithConditionalClauses2():
     response = client.post("/analyzeOneSentence",
                         headers={"Content-Type": "application/json"},
-                        json={"sentence": "If you heat ice it melts.", "lang":"en_US", "extentInfoJson": "{}"})    
+                        json={"sentence": "If you heat ice it melts.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False})    
     assert response.status_code == 200
     aso = AnalyzedSentenceObject.parse_obj(response.json())
     scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.currentId)
@@ -109,7 +109,7 @@ def test_SimpleSentenceWithConditionalClauses2():
 def test_SimpleSentenceWithConditionalClauses3():
     response = client.post("/analyzeOneSentence",
                         headers={"Content-Type": "application/json"},
-                        json={"sentence": "I didn't bring an umbrella, as the wind is so strong today.", "lang":"en_US", "extentInfoJson": "{}"})    
+                        json={"sentence": "I didn't bring an umbrella, as the wind is so strong today.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False})    
     assert response.status_code == 200
     aso = AnalyzedSentenceObject.parse_obj(response.json())
     scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.currentId)
@@ -128,7 +128,7 @@ def test_SimpleSentenceWithConditionalClauses3():
 def test_SimpleSentenceWithQuantitativeExpressions():
     response = client.post("/analyzeOneSentence",
                         headers={"Content-Type": "application/json"},
-                        json={"sentence": "His weight is over 70kg.", "lang":"en_US", "extentInfoJson": "{}"})    
+                        json={"sentence": "His weight is over 70kg.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False})    
     assert response.status_code == 200
     aso = AnalyzedSentenceObject.parse_obj(response.json())
     scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.currentId)
@@ -155,7 +155,7 @@ def test_SimpleSentenceWithQuantitativeExpressions():
 def test_SimpleSentenceWithQuantitativeExpressions():
     response = client.post("/analyzeOneSentence",
                         headers={"Content-Type": "application/json"},
-                        json={"sentence": "His weight is over 70kg.", "lang":"en_US", "extentInfoJson": "{}"})    
+                        json={"sentence": "His weight is over 70kg.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False})    
     assert response.status_code == 200
     aso = AnalyzedSentenceObject.parse_obj(response.json())
     scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.currentId)
@@ -181,7 +181,7 @@ def test_SimpleSentenceWithQuantitativeExpressions():
 def test_SimpleSentenceWithQuantitativeExpressions2():
     response = client.post("/analyzeOneSentence",
                         headers={"Content-Type": "application/json"},
-                        json={"sentence": "Its stock price has risen by more than $ 10.", "lang":"en_US", "extentInfoJson": "{}"})    
+                        json={"sentence": "Its stock price has risen by more than $ 10.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False})    
     assert response.status_code == 200
     aso = AnalyzedSentenceObject.parse_obj(response.json())
     scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.currentId)
@@ -209,7 +209,7 @@ def test_IrregularSimpleSentence():
     try:
         response = client.post("/analyzeOneSentence",
                             headers={"Content-Type": "application/json"},
-                            json={"sentence": "!#$%&Y'\"UIO\n strange =*+<H`OJWKFHgb", "lang":"en_US", "extentInfoJson": "{}"})    
+                            json={"sentence": "!#$%&Y'\"UIO\n strange =*+<H`OJWKFHgb", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False})    
         assert response.status_code == 200
         aso = AnalyzedSentenceObject.parse_obj(response.json())        
     except Exception:
@@ -231,7 +231,7 @@ def test_PremiseAndClaimEmpty():
 def test_PremiseOneSentenceAndClaimEmpty():
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json"},
-                        json={"premise": [{"sentence": "The answer is blown'in the wind.", "lang": "en_US", "extentInfoJson": "{}"}], "claim": []})    
+                        json={"premise": [{"sentence": "The answer is blown'in the wind.", "lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False}], "claim": []})    
     assert response.status_code == 200
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     assert len(asos.analyzedSentenceObjects) == 1
@@ -245,7 +245,7 @@ def test_PremiseOneSentenceAndClaimEmpty():
 def test_PremiseEnmptyAndClaimOneSentence():
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json"},
-                        json={"premise": [], "claim": [{"sentence": "The answer is blown'in the wind.","lang": "en_US", "extentInfoJson": "{}"}]})    
+                        json={"premise": [], "claim": [{"sentence": "The answer is blown'in the wind.","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False}]})    
     assert response.status_code == 200
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     assert len(asos.analyzedSentenceObjects) == 1
@@ -258,7 +258,7 @@ def test_PremiseEnmptyAndClaimOneSentence():
 def test_PremiseOneSentencetyAndClaimOneSentence():
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json"},
-                        json={"premise": [{"sentence": "You may say I'm a dreamer, But I'm not the only one.","lang": "en_US", "extentInfoJson": "{}"}], "claim": [{"sentence": "I hope someday you'll join us And the world will live as one.","lang":"en_US", "extentInfoJson": "{}"}]})    
+                        json={"premise": [{"sentence": "You may say I'm a dreamer, But I'm not the only one.","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False}], "claim": [{"sentence": "I hope someday you'll join us And the world will live as one.","lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False}]})    
     assert response.status_code == 200
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     assert len(asos.analyzedSentenceObjects) == 2
@@ -275,7 +275,7 @@ def test_PremiseOneSentencetyAndClaimOneSentence():
 def test_PremiseMultipleSentencetyAndClaimMultipleSentence():
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json"},
-                        json={"premise": [{"sentence": "Just The Way You Are!","lang": "en_US", "extentInfoJson": "{}"}, {"sentence": "The answer is blown'in the wind.","lang": "en_US", "extentInfoJson": "{}"}], "claim": [{"sentence": "You may say I'm a dreamer, But I'm not the only one.","lang": "en_US", "extentInfoJson": "{}"}, {"sentence": "I hope someday you'll join us And the world will live as one.","lang": "en_US", "extentInfoJson": "{}"}]})    
+                        json={"premise": [{"sentence": "Just The Way You Are!","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False}, {"sentence": "The answer is blown'in the wind.","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False}], "claim": [{"sentence": "You may say I'm a dreamer, But I'm not the only one.","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False}, {"sentence": "I hope someday you'll join us And the world will live as one.","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False}]})    
     assert response.status_code == 200
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     assert len(asos.analyzedSentenceObjects) == 4

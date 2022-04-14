@@ -5,7 +5,8 @@ This Microservice analyzes dependency's structure of English sentences and outpu
 
 [![Test And Build](https://github.com/toposoid/toposoid-sentence-parser-english-web/actions/workflows/action.yml/badge.svg)](https://github.com/toposoid/toposoid-sentence-parser-english-web/actions/workflows/action.yml)
 
-<img width="1108" src="https://user-images.githubusercontent.com/82787843/146093064-d0feff7b-51a6-49ab-a1d5-7d9f5a22935c.png">
+<img width="1099" src="https://user-images.githubusercontent.com/82787843/163391974-253c45bf-456d-4ef7-afe1-b996c24ea52a.png">
+
 
 ## Requirements
 * Docker version 20.10.x, or later
@@ -26,10 +27,12 @@ It takes more than 20 minutes to pull the Docker image for the first time.
 curl -X POST -H "Content-Type: application/json" -d '{
     "sentence":"The answer is blown'\''in the wind.", 
     "lang":"en_US", 
-    "extentInfoJson":"{}"
+    "extentInfoJson":"{}",
+    "isNegativeSentence":false, 
 }
 ' http://localhost:9007/analyzeOneSentence
 ```
+Currently, isNegativeSentence is always set to false when registering data.
 
 # Note
 * This microservice uses 9007 as the default port.

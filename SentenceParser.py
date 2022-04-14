@@ -31,10 +31,10 @@ class SentenceParser():
 
     #Get negative expressions and clause expressions in sentences
     def extractPreInfo(self, doc):
-        result = {"isDenial":[], "isConditionalConnection":[], "premiseNode":set()}
+        result = {"isDenialWord":[], "isConditionalConnection":[], "premiseNode":set()}
         for token in doc:
             if token.dep_ == "neg" and token.head != None:
-                result["isDenial"].append(token.head.i)
+                result["isDenialWord"].append(token.head.i)
             if token.pos_ == "SCONJ" and token.head != None:
                 result["isConditionalConnection"].append(token.head.i)
                 result["premiseNode"] = self.getPremiseNode(doc, token.head, {token.head.i})
@@ -74,7 +74,7 @@ class SentenceParser():
                 #For reasoning
                 nodeType = sentenceType
             isDenial = False
-            if "isDenial" in extractInfo and token.i in extractInfo["isDenial"]:
+            if "isDenialWord" in extractInfo and token.i in extractInfo["isDenialWord"]:
                 isDenial = True
             isConditionalConnection = False
             if "isConditionalConnection" in extractInfo and token.i in extractInfo["isConditionalConnection"]:
@@ -97,7 +97,7 @@ class SentenceParser():
                 rangeExpressions = rangeExp,
                 categories = {},
                 domains = {},
-                isDenial = isDenial,
+                isDenialWord = isDenial,
                 isConditionalConnection = isConditionalConnection,
                 surfaceYomi = "",
                 normalizedNameYomi = "",

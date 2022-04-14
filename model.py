@@ -25,6 +25,7 @@ class Knowledge(BaseModel):
     sentence:str
     lang:str
     extentInfoJson:str
+    isNegativeSentence:bool
 
 '''
 ref. https://github.com/toposoid/toposoid-deduction-protocol-model
@@ -51,7 +52,7 @@ class KnowledgeBaseNode(BaseModel):
     rangeExpressions:dict
     categories:dict
     domains:dict
-    isDenial:bool
+    isDenialWord:bool
     isConditionalConnection:bool
     normalizedNameYomi:str
     surfaceYomi:str
