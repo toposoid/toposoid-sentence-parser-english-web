@@ -5,7 +5,7 @@ This Microservice analyzes dependency's structure of English sentences and outpu
 
 [![Test And Build](https://github.com/toposoid/toposoid-sentence-parser-english-web/actions/workflows/action.yml/badge.svg)](https://github.com/toposoid/toposoid-sentence-parser-english-web/actions/workflows/action.yml)
 
-<img width="1099" src="https://user-images.githubusercontent.com/82787843/163391974-253c45bf-456d-4ef7-afe1-b996c24ea52a.png">
+<img width="1098" alt="" src="https://user-images.githubusercontent.com/82787843/169631035-3c40972e-717d-421f-b908-fdc014191718.png">
 
 
 ## Requirements
