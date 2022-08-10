@@ -132,6 +132,6 @@ class SentenceParser():
         hitInfo = list(filter(lambda x: x["begin"] <= beginIndex and x['end'] >= beginIndex, nerInfo))
         if len(hitInfo) != 0:
             nerExpression = hitInfo[0]["ner"]
-            rangeExpression = {hitInfo[0]["word"]:{"quantity":hitInfo[0]["quantity"], "unit":hitInfo[0]["unit"], "range":hitInfo[0]["range"]}}        
+            rangeExpression = {hitInfo[0]["word"]:{"quantity":hitInfo[0]["quantity"], "unit":hitInfo[0]["unit"], "range":hitInfo[0]["range"],"prefix":hitInfo[0]["prefix"] }}        
         return (nerExpression, rangeExpression)
 
