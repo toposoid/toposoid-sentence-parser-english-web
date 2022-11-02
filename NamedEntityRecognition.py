@@ -41,6 +41,7 @@ class NamedEntityRecognition():
                 unit = ""
                 quantitiy = ""
                 range = ""
+                prefix = ""
                 if "normalizedNER" in nerElement:
                     range = nerElement["normalizedNER"]
                     quantitiy = re.sub(r"[^\d.]", "", range)
