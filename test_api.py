@@ -47,7 +47,24 @@ def test_BasicSimpleSentence():
     sentence = " ".join(surfaces).replace(" .", ".")
     assert sentence == "This is a simple test."
     assert caseTypes == ['nsubj', 'ROOT', 'det', 'amod', 'attr', 'punct']
-    
+
+def test_BasicSimpleSentence2():
+    response = client.post("/analyzeOneSentence",
+                        headers={"Content-Type": "application/json"},
+                        json={"sentence":"Mark has overcome many hardships.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False})    
+    assert response.status_code == 200
+    aso = AnalyzedSentenceObject.parse_obj(response.json())
+    scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.currentId)
+    surfaces = []
+    caseTypes = []
+    for x in scoresSorted:
+        surfaces.append(x.surface)
+        caseTypes.append(x.caseType)
+    sentence = " ".join(surfaces).replace(" .", ".")
+    assert sentence == "Mark has overcome many hardships."
+    assert caseTypes == ['nsubj', 'aux', 'ROOT', 'amod', 'dobj', 'punct']
+
+
 def test_NegativeSimpleSentence():
     response = client.post("/analyzeOneSentence",
                             headers={"Content-Type": "application/json"},
