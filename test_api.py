@@ -26,7 +26,7 @@ def test_EmptySentence():
     try:
         response = client.post("/analyzeOneSentence",
                             headers={"Content-Type": "application/json"},
-                            json={"sentence": "", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False})    
+                            json={"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge": {"sentence": "", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False}})    
         assert response.status_code == 200
         aso = AnalyzedSentenceObject.parse_obj(response.json())        
     except Exception:
@@ -35,7 +35,7 @@ def test_EmptySentence():
 def test_BasicSimpleSentence():
     response = client.post("/analyzeOneSentence",
                         headers={"Content-Type": "application/json"},
-                        json={"sentence": "This is a simple test.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False})    
+                        json={"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge": {"sentence": "This is a simple test.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False}})    
     assert response.status_code == 200
     aso = AnalyzedSentenceObject.parse_obj(response.json())
     scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.currentId)
@@ -51,7 +51,7 @@ def test_BasicSimpleSentence():
 def test_BasicSimpleSentence2():
     response = client.post("/analyzeOneSentence",
                         headers={"Content-Type": "application/json"},
-                        json={"sentence":"Mark has overcome many hardships.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False})    
+                        json={"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge": {"sentence":"Mark has overcome many hardships.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False}})    
     assert response.status_code == 200
     aso = AnalyzedSentenceObject.parse_obj(response.json())
     scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.currentId)
@@ -68,7 +68,7 @@ def test_BasicSimpleSentence2():
 def test_NegativeSimpleSentence():
     response = client.post("/analyzeOneSentence",
                             headers={"Content-Type": "application/json"},
-                            json={"sentence": "The problem does not seem soluble.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False})    
+                            json={"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge": {"sentence": "The problem does not seem soluble.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False}})    
     assert response.status_code == 200
     aso = AnalyzedSentenceObject.parse_obj(response.json())
     scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.currentId)
@@ -88,7 +88,7 @@ def test_NegativeSimpleSentence():
 def test_SimpleSentenceWithConditionalClauses():
     response = client.post("/analyzeOneSentence",
                         headers={"Content-Type": "application/json"},
-                        json={"sentence": "If you heat ice, it melts.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False})    
+                        json={"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge": {"sentence": "If you heat ice, it melts.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False}})    
     assert response.status_code == 200
     aso = AnalyzedSentenceObject.parse_obj(response.json())
     scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.currentId)
@@ -107,7 +107,7 @@ def test_SimpleSentenceWithConditionalClauses():
 def test_SimpleSentenceWithConditionalClauses2():
     response = client.post("/analyzeOneSentence",
                         headers={"Content-Type": "application/json"},
-                        json={"sentence": "If you heat ice it melts.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False})    
+                        json={"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge": {"sentence": "If you heat ice it melts.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False}})    
     assert response.status_code == 200
     aso = AnalyzedSentenceObject.parse_obj(response.json())
     scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.currentId)
@@ -126,7 +126,7 @@ def test_SimpleSentenceWithConditionalClauses2():
 def test_SimpleSentenceWithConditionalClauses3():
     response = client.post("/analyzeOneSentence",
                         headers={"Content-Type": "application/json"},
-                        json={"sentence": "I didn't bring an umbrella, as the wind is so strong today.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False})    
+                        json={"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge": {"sentence": "I didn't bring an umbrella, as the wind is so strong today.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False}})    
     assert response.status_code == 200
     aso = AnalyzedSentenceObject.parse_obj(response.json())
     scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.currentId)
@@ -145,7 +145,7 @@ def test_SimpleSentenceWithConditionalClauses3():
 def test_SimpleSentenceWithQuantitativeExpressions0():
     response = client.post("/analyzeOneSentence",
                         headers={"Content-Type": "application/json"},
-                        json={"sentence": "His weight is 70kg.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False})    
+                        json={"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge": {"sentence": "His weight is 70kg.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False}})    
     assert response.status_code == 200
     aso = AnalyzedSentenceObject.parse_obj(response.json())
     scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.currentId)
@@ -173,7 +173,7 @@ def test_SimpleSentenceWithQuantitativeExpressions0():
 def test_SimpleSentenceWithQuantitativeExpressions1():
     response = client.post("/analyzeOneSentence",
                         headers={"Content-Type": "application/json"},
-                        json={"sentence": "His weight is over 70kg.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False})    
+                        json={"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge": {"sentence": "His weight is over 70kg.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False}})    
     assert response.status_code == 200
     aso = AnalyzedSentenceObject.parse_obj(response.json())
     scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.currentId)
@@ -202,7 +202,7 @@ def test_SimpleSentenceWithQuantitativeExpressions1():
 def test_SimpleSentenceWithQuantitativeExpressions2():
     response = client.post("/analyzeOneSentence",
                         headers={"Content-Type": "application/json"},
-                        json={"sentence": "Its stock price has risen by more than $ 10.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False})    
+                        json={"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "Its stock price has risen by more than $ 10.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False}})    
     assert response.status_code == 200
     aso = AnalyzedSentenceObject.parse_obj(response.json())
     scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.currentId)
@@ -231,7 +231,7 @@ def test_SimpleSentenceWithQuantitativeExpressions2():
 def test_SimpleSentenceWithQuantitativeExpressions3():
     response = client.post("/analyzeOneSentence",
                         headers={"Content-Type": "application/json"},
-                        json={"sentence": "The height limit is 170cm.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False})    
+                        json={"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "The height limit is 170cm.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False}})    
     assert response.status_code == 200
     aso = AnalyzedSentenceObject.parse_obj(response.json())
     scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.currentId)
@@ -260,7 +260,7 @@ def test_SimpleSentenceWithQuantitativeExpressions3():
 def test_SimpleSentenceWithQuantitativeExpressions4():
     response = client.post("/analyzeOneSentence",
                         headers={"Content-Type": "application/json"},
-                        json={"sentence": "The deadline was April 1, 2022.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False})    
+                        json={"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "The deadline was April 1, 2022.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False}})    
     #The deadline was April 1, 2022.
     #The deadline is from April 2022 to April 2023.
     assert response.status_code == 200
@@ -289,7 +289,7 @@ def test_SimpleSentenceWithQuantitativeExpressions4():
 def test_SimpleSentenceWithQuantitativeExpressions5():
     response = client.post("/analyzeOneSentence",
                         headers={"Content-Type": "application/json"},
-                        json={"sentence": "The deadline was 23:59:59.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False})    
+                        json={"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "The deadline was 23:59:59.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False}})    
     assert response.status_code == 200
     aso = AnalyzedSentenceObject.parse_obj(response.json())
     scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.currentId)
@@ -319,7 +319,7 @@ def test_IrregularSimpleSentence():
     try:
         response = client.post("/analyzeOneSentence",
                             headers={"Content-Type": "application/json"},
-                            json={"sentence": "!#$%&Y'\"UIO\n strange =*+<H`OJWKFHgb", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False})    
+                            json={"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge": {"sentence": "!#$%&Y'\"UIO\n strange =*+<H`OJWKFHgb", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False}})    
         assert response.status_code == 200
         aso = AnalyzedSentenceObject.parse_obj(response.json())        
     except Exception:
@@ -341,7 +341,7 @@ def test_PremiseAndClaimEmpty():
 def test_PremiseOneSentenceAndClaimEmpty():
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json"},
-                        json={"premise": [{"sentence": "The answer is blown'in the wind.", "lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False}], "claim": []})    
+                        json={"premise": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "The answer is blown'in the wind.", "lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False}}], "claim": []})    
     assert response.status_code == 200
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     assert len(asos.analyzedSentenceObjects) == 1
@@ -355,7 +355,7 @@ def test_PremiseOneSentenceAndClaimEmpty():
 def test_PremiseEnmptyAndClaimOneSentence():
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json"},
-                        json={"premise": [], "claim": [{"sentence": "The answer is blown'in the wind.","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False}]})    
+                        json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "The answer is blown'in the wind.","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False}}]})    
     assert response.status_code == 200
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     assert len(asos.analyzedSentenceObjects) == 1
@@ -368,7 +368,7 @@ def test_PremiseEnmptyAndClaimOneSentence():
 def test_PremiseOneSentencetyAndClaimOneSentence():
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json"},
-                        json={"premise": [{"sentence": "You may say I'm a dreamer, But I'm not the only one.","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False}], "claim": [{"sentence": "I hope someday you'll join us And the world will live as one.","lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False}]})    
+                        json={"premise": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "You may say I'm a dreamer, But I'm not the only one.","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False}}], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "I hope someday you'll join us And the world will live as one.","lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False}}]})    
     assert response.status_code == 200
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     assert len(asos.analyzedSentenceObjects) == 2
@@ -385,7 +385,7 @@ def test_PremiseOneSentencetyAndClaimOneSentence():
 def test_PremiseMultipleSentencetyAndClaimMultipleSentence():
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json"},
-                        json={"premise": [{"sentence": "Just The Way You Are!","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False}, {"sentence": "The answer is blown'in the wind.","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False}], "claim": [{"sentence": "You may say I'm a dreamer, But I'm not the only one.","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False}, {"sentence": "I hope someday you'll join us And the world will live as one.","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False}]})    
+                        json={"premise": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "Just The Way You Are!","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False}}, {"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "The answer is blown'in the wind.","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False}}], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "You may say I'm a dreamer, But I'm not the only one.","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False}}, {"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "I hope someday you'll join us And the world will live as one.","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False}}]})    
     assert response.status_code == 200
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     assert len(asos.analyzedSentenceObjects) == 4
