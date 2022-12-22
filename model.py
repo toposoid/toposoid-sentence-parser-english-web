@@ -34,6 +34,23 @@ com.ideal.linked.toposoid.protocol.model.parser
 class InputSentence(BaseModel):
     premise:List[Knowledge] 
     claim:List[Knowledge]
+
+'''
+ref. https://github.com/toposoid/toposoid-deduction-protocol-model
+com.ideal.linked.toposoid.protocol.model.parser
+'''
+class KnowledgeForParser(BaseModel):
+    propositionId:str
+    sentenceId:str
+    knowledge:Knowledge
+'''
+ref. https://github.com/toposoid/toposoid-deduction-protocol-model
+com.ideal.linked.toposoid.protocol.model.parser
+'''
+class InputSentenceForParser(BaseModel):
+    premise:List[KnowledgeForParser] 
+    claim:List[KnowledgeForParser]
+
 '''
 ref. https://github.com/toposoid/toposoid-knowledgebase-model
 com.ideal.linked.toposoid.knowledgebase.model
@@ -91,6 +108,8 @@ class AnalyzedSentenceObject(BaseModel):
     nodeMap:Dict[str, KnowledgeBaseNode]
     edgeList:List[KnowledgeBaseEdge]
     sentenceType:int
+    sentenceId:str
+    lang:str
     deductionResultMap:Dict[str, DeductionResult]
 
 '''

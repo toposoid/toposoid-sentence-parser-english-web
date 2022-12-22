@@ -15,7 +15,7 @@
  '''
 
 import spacy
-from model import Knowledge, KnowledgeBaseNode, KnowledgeBaseEdge, AnalyzedSentenceObject, DeductionResult
+from model import KnowledgeForParser, KnowledgeBaseNode, KnowledgeBaseEdge, AnalyzedSentenceObject, DeductionResult
 from NamedEntityRecognition import NamedEntityRecognition
 import uuid
 
@@ -55,14 +55,15 @@ class SentenceParser():
         return result
 
     # main function
-    def parse(self, sentence, sentenceType, lang):
-        doc = self.nlp(sentence)
+    def parse(self, knowledgeForParser:KnowledgeForParser, sentenceType:int):
+        doc = self.nlp(knowledgeForParser.knowledge.sentence)
         extractInfo = self.extractPreInfo(doc)    
         nodeMap = {}
         edgeList = []
-        propositionId = str(uuid.uuid4())  
+        propositionId = knowledgeForParser.propositionId
+        sentenceId = knowledgeForParser.sentenceId
         beginIndex = 0        
-        nerInfo = self.namedEntityRecognition.getNerAndSpanExpression(sentence)
+        nerInfo = self.namedEntityRecognition.getNerAndSpanExpression(knowledgeForParser.knowledge.sentence)
 
         for token in doc:        
             if sentenceType == "-1": 
@@ -84,7 +85,7 @@ class SentenceParser():
             beginIndex = beginIndex + len(token.text) + 1
 
             node = KnowledgeBaseNode(
-                nodeId = propositionId + "-" + str(token.i),
+                nodeId = sentenceId + "-" + str(token.i),
                 propositionId = propositionId,
                 currentId = token.i,
                 parentId = token.head.i,
@@ -104,23 +105,23 @@ class SentenceParser():
                 modalityType =  "-",
                 logicType = "-",
                 nodeType = nodeType,
-                lang = lang,
+                lang = knowledgeForParser.knowledge.lang,
                 extentText ="{}"
             )
-            nodeMap[propositionId + "-" + str(token.i)] = node
+            nodeMap[sentenceId + "-" + str(token.i)] = node
             
             if token.i != token.head.i:
                 edgeList.append(KnowledgeBaseEdge(
-                    sourceId = propositionId + "-" + str(token.i),
-                    destinationId = propositionId + "-" + str(token.head.i),
+                    sourceId = sentenceId + "-" + str(token.i),
+                    destinationId = sentenceId + "-" + str(token.head.i),
                     caseStr = token.dep_,
                     dependType = "-",
                     logicType = "-",
-                    lang = lang
+                    lang = knowledgeForParser.knowledge.lang
                 ))
             
         defaultDeductionResult = DeductionResult(status=False,matchedPropositionIds=[], deductionUnit="")
-        aso = AnalyzedSentenceObject(nodeMap=nodeMap, edgeList=edgeList, sentenceType=sentenceType, deductionResultMap={"0":defaultDeductionResult, "1":defaultDeductionResult})
+        aso = AnalyzedSentenceObject(nodeMap=nodeMap, edgeList=edgeList, sentenceType=sentenceType, sentenceId=knowledgeForParser.sentenceId, lang=knowledgeForParser.knowledge.lang, deductionResultMap={"0":defaultDeductionResult, "1":defaultDeductionResult})
         return aso
 
     #Get named entity and quantity range representation from words starting with a character index.

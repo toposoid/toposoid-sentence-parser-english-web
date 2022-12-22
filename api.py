@@ -15,7 +15,7 @@
  '''
 
 from fastapi import FastAPI
-from model import InputSentence, Knowledge, AnalyzedSentenceObjects
+from model import InputSentenceForParser, KnowledgeForParser, AnalyzedSentenceObjects
 from SentenceParser import SentenceParser
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
@@ -42,9 +42,9 @@ app.add_middleware(
 )
 # This API isfor building KnoledgeBase
 @app.post("/analyzeOneSentence")
-def analyzeOneSentence(knowledge:Knowledge):
+def analyzeOneSentence(knowledgeForParser:KnowledgeForParser):
     try:
-        aso = parser.parse(knowledge.sentence, "-1", knowledge.lang)
+        aso = parser.parse(knowledgeForParser, "-1")
         return JSONResponse(content=jsonable_encoder(aso))
     except Exception as e:
         LOG.error(traceback.format_exc())
@@ -52,13 +52,13 @@ def analyzeOneSentence(knowledge:Knowledge):
 
 #This API is for inference
 @app.post("/analyze")
-def analyze(inputSentence:InputSentence):
+def analyze(inputSentenceForParser:InputSentenceForParser):
     try:
         asos = []
-        for knowledge in inputSentence.premise:
-            asos.append(parser.parse(knowledge.sentence, 0, knowledge.lang))
-        for knowledge in inputSentence.claim:
-            asos.append(parser.parse(knowledge.sentence, 1, knowledge.lang))
+        for knowledgeForParser in inputSentenceForParser.premise:
+            asos.append(parser.parse(knowledgeForParser, "0"))
+        for knowledgeForParser in inputSentenceForParser.claim:
+            asos.append(parser.parse(knowledgeForParser, "1"))
         return JSONResponse(content=jsonable_encoder(AnalyzedSentenceObjects(analyzedSentenceObjects = asos)))
     except Exception as e:
         LOG.error(traceback.format_exc())
