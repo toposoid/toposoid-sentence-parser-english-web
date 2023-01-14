@@ -29,7 +29,7 @@ import traceback
 
 app = FastAPI(
     title="toposoid-sentence-parser-english-web",
-    version="0.1-SNAPSHOT"
+    version="0.4-SNAPSHOT"
 )
 parser = SentenceParser()
 
