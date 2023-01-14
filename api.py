@@ -41,6 +41,7 @@ app.add_middleware(
     allow_headers=["*"]
 )
 # This API isfor building KnoledgeBase
+'''
 @app.post("/analyzeOneSentence")
 def analyzeOneSentence(knowledgeForParser:KnowledgeForParser):
     try:
@@ -49,12 +50,13 @@ def analyzeOneSentence(knowledgeForParser:KnowledgeForParser):
     except Exception as e:
         LOG.error(traceback.format_exc())
         return JSONResponse({"status": "ERROR", "message": traceback.format_exc()})
-
+'''
 #This API is for inference
 @app.post("/analyze")
 def analyze(inputSentenceForParser:InputSentenceForParser):
     try:
         asos = []
+        if len(inputSentenceForParser.premise) > 0 and len(inputSentenceForParser.claim) == 0: return JSONResponse({"status": "ERROR", "message": "It is not possible to register only as a prerequisite. If you have any premises, please also register a claim."}, status_code = 400)
         for knowledgeForParser in inputSentenceForParser.premise:
             asos.append(parser.parse(knowledgeForParser, "0"))
         for knowledgeForParser in inputSentenceForParser.claim:
