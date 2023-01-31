@@ -15,7 +15,7 @@
  '''
 
 from fastapi import FastAPI
-from model import InputSentence, Knowledge, AnalyzedSentenceObjects
+from model import InputSentenceForParser, KnowledgeForParser, AnalyzedSentenceObjects
 from SentenceParser import SentenceParser
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
@@ -29,7 +29,7 @@ import traceback
 
 app = FastAPI(
     title="toposoid-sentence-parser-english-web",
-    version="0.1-SNAPSHOT"
+    version="0.4-SNAPSHOT"
 )
 parser = SentenceParser()
 
@@ -41,24 +41,26 @@ app.add_middleware(
     allow_headers=["*"]
 )
 # This API isfor building KnoledgeBase
+'''
 @app.post("/analyzeOneSentence")
-def analyzeOneSentence(knowledge:Knowledge):
+def analyzeOneSentence(knowledgeForParser:KnowledgeForParser):
     try:
-        aso = parser.parse(knowledge.sentence, "-1", knowledge.lang)
+        aso = parser.parse(knowledgeForParser, "-1")
         return JSONResponse(content=jsonable_encoder(aso))
     except Exception as e:
         LOG.error(traceback.format_exc())
         return JSONResponse({"status": "ERROR", "message": traceback.format_exc()})
-
+'''
 #This API is for inference
 @app.post("/analyze")
-def analyze(inputSentence:InputSentence):
+def analyze(inputSentenceForParser:InputSentenceForParser):
     try:
         asos = []
-        for knowledge in inputSentence.premise:
-            asos.append(parser.parse(knowledge.sentence, 0, knowledge.lang))
-        for knowledge in inputSentence.claim:
-            asos.append(parser.parse(knowledge.sentence, 1, knowledge.lang))
+        if len(inputSentenceForParser.premise) > 0 and len(inputSentenceForParser.claim) == 0: return JSONResponse({"status": "ERROR", "message": "It is not possible to register only as a prerequisite. If you have any premises, please also register a claim."}, status_code = 400)
+        for knowledgeForParser in inputSentenceForParser.premise:
+            asos.append(parser.parse(knowledgeForParser, "0"))
+        for knowledgeForParser in inputSentenceForParser.claim:
+            asos.append(parser.parse(knowledgeForParser, "1"))
         return JSONResponse(content=jsonable_encoder(AnalyzedSentenceObjects(analyzedSentenceObjects = asos)))
     except Exception as e:
         LOG.error(traceback.format_exc())

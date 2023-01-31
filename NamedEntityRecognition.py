@@ -18,6 +18,7 @@ import requests
 import json 
 import re
 import os 
+from unit import getUnitAndPrefixSymbol
 
 # This class is obliged to use Stanford CoreNLP to get the NER and range representation of numbers
 class NamedEntityRecognition():
@@ -40,19 +41,28 @@ class NamedEntityRecognition():
                 unit = ""
                 quantitiy = ""
                 range = ""
+                prefix = ""
                 if "normalizedNER" in nerElement:
                     range = nerElement["normalizedNER"]
-                    quantitiy = re.sub(r"[^\d.]", "", range)                    
-                    unit = self.getUnit(range, quantitiy, tokens[int(nerElement["tokenEnd"])])                    
-                nerResult.append({"word":word, "ner":ner, "begin":begin, "end":end, "quantity":quantitiy, "unit":unit, "range":range})                                 
+                    quantitiy = re.sub(r"[^\d.]", "", range)
+                    if ner == "DATE":
+                        quantitiy = nerElement["normalizedNER"]
+                    elif ner == "TIME":
+                        #remove first T
+                        range = nerElement["normalizedNER"][1:]
+                        quantitiy = nerElement["normalizedNER"][1:]
+
+                    prefix, unit = self.getPrefixAndUnit(range, quantitiy, tokens[int(nerElement["tokenEnd"])])                    
+                nerResult.append({"word":word, "ner":ner, "begin":begin, "end":end, "quantity":quantitiy, "unit":unit, "range":range, "prefix": prefix})                                 
         return nerResult
 
     #Attempt to get the unit of quantity expression
-    def getUnit(self, range, quantitiy, nextToken):
+    def getPrefixAndUnit(self, range, quantitiy, nextToken):
         unit = range.replace(quantitiy, "").replace("<", "").replace(">", "").replace("=", "").strip()
         if unit == "":
             #If the CoreNLP normalized NER does not contain a unit,
             #The next word pos in the quantification expression gets that of NNS.
-            if nextToken["pos"] == "NNS":
+            if nextToken["pos"] == "NNS" or nextToken["pos"] == "NN":
                 unit = nextToken["word"]
-        return unit
+            
+        return getUnitAndPrefixSymbol(unit)
