@@ -9,7 +9,7 @@ networks:
 
 services:
   toposoid-sentence-parser-english-web:
-    image: toposoid-sentence-parser-english-web:0.5-SNAPSHOT
+    image: toposoid-sentence-parser-english-web:0.4
     tty: true
     environment:
       - CORENLP_HOST=172.30.0.3
