@@ -15,7 +15,7 @@
  '''
 
 import spacy
-from model import KnowledgeForParser, KnowledgeBaseNode, KnowledgeBaseEdge, AnalyzedSentenceObject, DeductionResult
+from model import KnowledgeForParser, KnowledgeBaseNode, LocalContext, PredicateArgumentStructure, KnowledgeBaseEdge, AnalyzedSentenceObject, DeductionResult
 from NamedEntityRecognition import NamedEntityRecognition
 import uuid
 
@@ -84,9 +84,16 @@ class SentenceParser():
             nerExp, rangeExp = self.extractNerAndRange(beginIndex, nerInfo)
             beginIndex = beginIndex + len(token.text) + 1
 
-            node = KnowledgeBaseNode(
-                nodeId = sentenceId + "-" + str(token.i),
-                propositionId = propositionId,
+            localContext = LocalContext(
+                lang = knowledgeForParser.knowledge.lang,
+                namedEntity = nerExp,
+                rangeExpressions = rangeExp,
+                categories = {},
+                domains = {},
+                referenceIdMap = {}
+            )
+            
+            predicateArgumentStructure = PredicateArgumentStructure(
                 currentId = token.i,
                 parentId = token.head.i,
                 isMainSection = True,
@@ -94,10 +101,6 @@ class SentenceParser():
                 normalizedName = token.lemma_,
                 dependType = "-",
                 caseType = token.dep_,
-                namedEntity = nerExp,
-                rangeExpressions = rangeExp,
-                categories = {},
-                domains = {},
                 isDenialWord = isDenial,
                 isConditionalConnection = isConditionalConnection,
                 surfaceYomi = "",
@@ -105,7 +108,15 @@ class SentenceParser():
                 modalityType =  "-",
                 logicType = "-",
                 nodeType = nodeType,
-                lang = knowledgeForParser.knowledge.lang,
+                morphemes = [token.pos_]
+            )
+
+            node = KnowledgeBaseNode(
+                nodeId = sentenceId + "-" + str(token.i),
+                propositionId = propositionId,
+                sentenceId = sentenceId,
+                predicateArgumentStructure = predicateArgumentStructure,
+                localContext = localContext,
                 extentText ="{}"
             )
             nodeMap[sentenceId + "-" + str(token.i)] = node
