@@ -52,8 +52,8 @@ def test_PremiseEnmptyAndClaimOneSentence():
     assert len(asos.analyzedSentenceObjects) == 1
     aso = asos.analyzedSentenceObjects[0]
     assert aso.sentenceType == 1
-    scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.currentId) 
-    sentence =  reduce(lambda a, b: a + " " + b.surface, scoresSorted, "")
+    scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.predicateArgumentStructure.currentId) 
+    sentence =  reduce(lambda a, b: a + " " + b.predicateArgumentStructure.surface, scoresSorted, "")
     assert sentence.replace(" .", ".").strip() == "The answer is blown'in the wind."
 
 
@@ -64,14 +64,14 @@ def test_NegativeSimpleSentence():
     assert response.status_code == 200
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     for aso in asos.analyzedSentenceObjects:
-        scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.currentId)
+        scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.predicateArgumentStructure.currentId)
         surfaces = []
         caseTypes = []
         denialIndex = -1
         for i, x in enumerate(scoresSorted):
-            surfaces.append(x.surface)
-            caseTypes.append(x.caseType)
-            if x.isDenialWord: denialIndex  = i
+            surfaces.append(x.predicateArgumentStructure.surface)
+            caseTypes.append(x.predicateArgumentStructure.caseType)
+            if x.predicateArgumentStructure.isDenialWord: denialIndex  = i
         sentence = " ".join(surfaces).replace(" .", ".")
         assert sentence == "The problem does not seem soluble."
         assert caseTypes == ['det', 'nsubj', 'aux', 'neg', 'ROOT', 'oprd', 'punct']
@@ -86,8 +86,8 @@ def test_PremiseOneSentencetyAndClaimOneSentence():
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     assert len(asos.analyzedSentenceObjects) == 2
     for aso in asos.analyzedSentenceObjects:
-        scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.currentId) 
-        sentence =  reduce(lambda a, b: a + " " + b.surface, scoresSorted, "").replace(" .", ".").replace(" ,", ",").replace(" '", "'").strip()
+        scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.predicateArgumentStructure.currentId) 
+        sentence =  reduce(lambda a, b: a + " " + b.predicateArgumentStructure.surface, scoresSorted, "").replace(" .", ".").replace(" ,", ",").replace(" '", "'").strip()
         if aso.sentenceType == 0:
             assert sentence == "You may say I'm a dreamer, But I'm not the only one."
         elif aso.sentenceType == 1:
@@ -103,8 +103,8 @@ def test_PremiseMultipleSentencetyAndClaimMultipleSentence():
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     assert len(asos.analyzedSentenceObjects) == 4
     for aso in asos.analyzedSentenceObjects:
-        scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.currentId) 
-        sentence =  reduce(lambda a, b: a + " " + b.surface, scoresSorted, "").replace(" .", ".").replace(" ,", ",").replace(" '", "'").strip()
+        scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.predicateArgumentStructure.currentId) 
+        sentence =  reduce(lambda a, b: a + " " + b.predicateArgumentStructure.surface, scoresSorted, "").replace(" .", ".").replace(" ,", ",").replace(" '", "'").strip()
         if aso.sentenceType == 0:
             assert sentence == "Just The Way You Are !" or sentence == "The answer is blown'in the wind."
         elif aso.sentenceType == 1:
@@ -120,7 +120,7 @@ def test_SimpleSentenceWithQuantitativeExpressions0():
     assert response.status_code == 200
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     for aso in asos.analyzedSentenceObjects:
-        scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.currentId)
+        scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.predicateArgumentStructure.currentId)
         surfaces = []
         caseTypes = []
         quantity = ""
@@ -128,13 +128,13 @@ def test_SimpleSentenceWithQuantitativeExpressions0():
         range  = ""  
         prefix = ""  
         for x in scoresSorted:
-            surfaces.append(x.surface)
-            caseTypes.append(x.caseType)
-            if "70" in x.rangeExpressions:
-                quantity = x.rangeExpressions["70"]["quantity"]
-                unit = x.rangeExpressions["70"]["unit"]
-                range = x.rangeExpressions["70"]["range"]
-                prefix = x.rangeExpressions["70"]["prefix"]
+            surfaces.append(x.predicateArgumentStructure.surface)
+            caseTypes.append(x.predicateArgumentStructure.caseType)
+            if "70" in x.localContext.rangeExpressions:
+                quantity = x.localContext.rangeExpressions["70"]["quantity"]
+                unit = x.localContext.rangeExpressions["70"]["unit"]
+                range = x.localContext.rangeExpressions["70"]["range"]
+                prefix = x.localContext.rangeExpressions["70"]["prefix"]
         sentence = " ".join(surfaces).replace(" .", ".")
         assert sentence == "His weight is 70 kg."
         assert quantity == "70.0"
@@ -149,7 +149,7 @@ def test_SimpleSentenceWithQuantitativeExpressions1():
     assert response.status_code == 200
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     for aso in asos.analyzedSentenceObjects:
-        scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.currentId)
+        scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.predicateArgumentStructure.currentId)
         surfaces = []
         caseTypes = []
         quantity = ""
@@ -157,13 +157,13 @@ def test_SimpleSentenceWithQuantitativeExpressions1():
         range  = ""    
         prefix = ""
         for x in scoresSorted:
-            surfaces.append(x.surface)
-            caseTypes.append(x.caseType)
-            if "70" in x.rangeExpressions:
-                quantity = x.rangeExpressions["70"]["quantity"]
-                unit = x.rangeExpressions["70"]["unit"]
-                range = x.rangeExpressions["70"]["range"]
-                prefix = x.rangeExpressions["70"]["prefix"]
+            surfaces.append(x.predicateArgumentStructure.surface)
+            caseTypes.append(x.predicateArgumentStructure.caseType)
+            if "70" in x.localContext.rangeExpressions:
+                quantity = x.localContext.rangeExpressions["70"]["quantity"]
+                unit = x.localContext.rangeExpressions["70"]["unit"]
+                range = x.localContext.rangeExpressions["70"]["range"]
+                prefix = x.localContext.rangeExpressions["70"]["prefix"]
                 
         sentence = " ".join(surfaces).replace(" .", ".")
         assert sentence == "His weight is over 70 kg."
@@ -179,7 +179,7 @@ def test_SimpleSentenceWithQuantitativeExpressions2():
     assert response.status_code == 200
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     for aso in asos.analyzedSentenceObjects:
-        scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.currentId)
+        scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.predicateArgumentStructure.currentId)
         surfaces = []
         caseTypes = []
         quantity = ""
@@ -187,13 +187,13 @@ def test_SimpleSentenceWithQuantitativeExpressions2():
         range  = ""    
         prefix = ""
         for x in scoresSorted:
-            surfaces.append(x.surface)
-            caseTypes.append(x.caseType)
-            if "$ 10" in x.rangeExpressions:
-                quantity = x.rangeExpressions["$ 10"]["quantity"]
-                unit = x.rangeExpressions["$ 10"]["unit"]
-                range = x.rangeExpressions["$ 10"]["range"]
-                prefix = x.rangeExpressions["$ 10"]["prefix"]
+            surfaces.append(x.predicateArgumentStructure.surface)
+            caseTypes.append(x.predicateArgumentStructure.caseType)
+            if "$ 10" in x.localContext.rangeExpressions:
+                quantity = x.localContext.rangeExpressions["$ 10"]["quantity"]
+                unit = x.localContext.rangeExpressions["$ 10"]["unit"]
+                range = x.localContext.rangeExpressions["$ 10"]["range"]
+                prefix = x.localContext.rangeExpressions["$ 10"]["prefix"]
                 
         sentence = " ".join(surfaces).replace(" .", ".")
         assert sentence == "Its stock price has risen by more than $ 10."
@@ -209,7 +209,7 @@ def test_SimpleSentenceWithQuantitativeExpressions3():
     assert response.status_code == 200
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     for aso in asos.analyzedSentenceObjects:
-        scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.currentId)
+        scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.predicateArgumentStructure.currentId)
         surfaces = []
         caseTypes = []
         quantity = ""
@@ -217,13 +217,13 @@ def test_SimpleSentenceWithQuantitativeExpressions3():
         range  = ""    
         prefix = ""
         for x in scoresSorted:
-            surfaces.append(x.surface)
-            caseTypes.append(x.caseType)
-            if "170" in x.rangeExpressions:
-                quantity = x.rangeExpressions["170"]["quantity"]
-                unit = x.rangeExpressions["170"]["unit"]
-                range = x.rangeExpressions["170"]["range"]
-                prefix = x.rangeExpressions["170"]["prefix"]
+            surfaces.append(x.predicateArgumentStructure.surface)
+            caseTypes.append(x.predicateArgumentStructure.caseType)
+            if "170" in x.localContext.rangeExpressions:
+                quantity = x.localContext.rangeExpressions["170"]["quantity"]
+                unit = x.localContext.rangeExpressions["170"]["unit"]
+                range = x.localContext.rangeExpressions["170"]["range"]
+                prefix = x.localContext.rangeExpressions["170"]["prefix"]
                 
         sentence = " ".join(surfaces).replace(" .", ".")
         assert sentence == "The height limit is 170 cm."
@@ -241,19 +241,19 @@ def test_SimpleSentenceWithQuantitativeExpressions4():
     assert response.status_code == 200
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     for aso in asos.analyzedSentenceObjects:
-        scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.currentId)
+        scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.predicateArgumentStructure.currentId)
         surfaces = []
         caseTypes = []
         quantity = ""
         unit = ""
         range  = ""        
         for x in scoresSorted:
-            surfaces.append(x.surface)
-            caseTypes.append(x.caseType)
-            if "April 1, 2022" in x.rangeExpressions:
-                quantity = x.rangeExpressions["April 1, 2022"]["quantity"]
-                unit = x.rangeExpressions["April 1, 2022"]["unit"]
-                range = x.rangeExpressions["April 1, 2022"]["range"]
+            surfaces.append(x.predicateArgumentStructure.surface)
+            caseTypes.append(x.predicateArgumentStructure.caseType)
+            if "April 1, 2022" in x.localContext.rangeExpressions:
+                quantity = x.localContext.rangeExpressions["April 1, 2022"]["quantity"]
+                unit = x.localContext.rangeExpressions["April 1, 2022"]["unit"]
+                range = x.localContext.rangeExpressions["April 1, 2022"]["range"]
                 
         sentence = " ".join(surfaces).replace(" .", ".")
         assert sentence == "The deadline was April 1 , 2022."
@@ -269,7 +269,7 @@ def test_SimpleSentenceWithQuantitativeExpressions5():
     assert response.status_code == 200
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     for aso in asos.analyzedSentenceObjects:
-        scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.currentId)
+        scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.predicateArgumentStructure.currentId)
         surfaces = []
         caseTypes = []
         quantity = ""
@@ -277,12 +277,12 @@ def test_SimpleSentenceWithQuantitativeExpressions5():
         range  = ""    
         
         for x in scoresSorted:
-            surfaces.append(x.surface)
-            caseTypes.append(x.caseType)
-            if "23:59:59" in x.rangeExpressions:
-                quantity = x.rangeExpressions["23:59:59"]["quantity"]
-                unit = x.rangeExpressions["23:59:59"]["unit"]
-                range = x.rangeExpressions["23:59:59"]["range"]
+            surfaces.append(x.predicateArgumentStructure.surface)
+            caseTypes.append(x.predicateArgumentStructure.caseType)
+            if "23:59:59" in x.localContext.rangeExpressions:
+                quantity = x.localContext.rangeExpressions["23:59:59"]["quantity"]
+                unit = x.localContext.rangeExpressions["23:59:59"]["unit"]
+                range = x.localContext.rangeExpressions["23:59:59"]["range"]
                 
         sentence = " ".join(surfaces).replace(" .", ".")
         assert sentence == "The deadline was 23:59:59."

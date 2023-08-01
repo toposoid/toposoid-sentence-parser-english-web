@@ -55,9 +55,19 @@ class InputSentenceForParser(BaseModel):
 ref. https://github.com/toposoid/toposoid-knowledgebase-model
 com.ideal.linked.toposoid.knowledgebase.model
 '''
-class KnowledgeBaseNode(BaseModel):
-    nodeId:str
-    propositionId:str
+class LocalContext(BaseModel):
+    lang: str
+    namedEntity: str
+    rangeExpressions: dict
+    categories: dict
+    domains: dict
+    referenceIdMap: dict
+
+'''
+ref. https://github.com/toposoid/toposoid-knowledgebase-model
+com.ideal.linked.toposoid.knowledgebase.model
+'''
+class PredicateArgumentStructure(BaseModel):
     currentId:int
     parentId:int
     isMainSection:bool
@@ -65,10 +75,6 @@ class KnowledgeBaseNode(BaseModel):
     normalizedName:str
     dependType:str
     caseType:str
-    namedEntity:str
-    rangeExpressions:dict
-    categories:dict
-    domains:dict
     isDenialWord:bool
     isConditionalConnection:bool
     normalizedNameYomi:str
@@ -76,7 +82,18 @@ class KnowledgeBaseNode(BaseModel):
     modalityType:str
     logicType:str
     nodeType:int
-    lang:str
+    morphemes:List[str]
+
+'''
+ref. https://github.com/toposoid/toposoid-knowledgebase-model
+com.ideal.linked.toposoid.knowledgebase.model
+'''
+class KnowledgeBaseNode(BaseModel):
+    nodeId:str
+    propositionId:str
+    sentenceId:str
+    predicateArgumentStructure:PredicateArgumentStructure
+    localContext:LocalContext
     extentText:str  
 
 '''
