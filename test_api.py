@@ -51,7 +51,7 @@ def test_PremiseEnmptyAndClaimOneSentence():
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     assert len(asos.analyzedSentenceObjects) == 1
     aso = asos.analyzedSentenceObjects[0]
-    assert aso.sentenceType == 1
+    assert aso.knowledgeFeatureNode.sentenceType == 1
     scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.predicateArgumentStructure.currentId) 
     sentence =  reduce(lambda a, b: a + " " + b.predicateArgumentStructure.surface, scoresSorted, "")
     assert sentence.replace(" .", ".").strip() == "The answer is blown'in the wind."
@@ -88,9 +88,9 @@ def test_PremiseOneSentencetyAndClaimOneSentence():
     for aso in asos.analyzedSentenceObjects:
         scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.predicateArgumentStructure.currentId) 
         sentence =  reduce(lambda a, b: a + " " + b.predicateArgumentStructure.surface, scoresSorted, "").replace(" .", ".").replace(" ,", ",").replace(" '", "'").strip()
-        if aso.sentenceType == 0:
+        if aso.knowledgeFeatureNode.sentenceType == 0:
             assert sentence == "You may say I'm a dreamer, But I'm not the only one."
-        elif aso.sentenceType == 1:
+        elif aso.knowledgeFeatureNode.sentenceType == 1:
             assert sentence == "I hope someday you'll join us And the world will live as one."
         else:
             pytest.fail("Unexpected Error ..")
@@ -105,9 +105,9 @@ def test_PremiseMultipleSentencetyAndClaimMultipleSentence():
     for aso in asos.analyzedSentenceObjects:
         scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.predicateArgumentStructure.currentId) 
         sentence =  reduce(lambda a, b: a + " " + b.predicateArgumentStructure.surface, scoresSorted, "").replace(" .", ".").replace(" ,", ",").replace(" '", "'").strip()
-        if aso.sentenceType == 0:
+        if aso.knowledgeFeatureNode.sentenceType == 0:
             assert sentence == "Just The Way You Are !" or sentence == "The answer is blown'in the wind."
-        elif aso.sentenceType == 1:
+        elif aso.knowledgeFeatureNode.sentenceType == 1:
             assert sentence == "You may say I'm a dreamer, But I'm not the only one." or sentence == "I hope someday you'll join us And the world will live as one."
         else:
             pytest.fail("Unexpected Error ..")

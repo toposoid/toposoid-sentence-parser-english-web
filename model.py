@@ -109,6 +109,27 @@ class KnowledgeBaseEdge(BaseModel):
     lang:str
 
 '''
+ref. https://github.com/toposoid/toposoid-knowledgebase-model
+com.ideal.linked.toposoid.knowledgebase.model
+'''
+class LocalContextForFeature(BaseModel):
+    lang: str
+    referenceIdMap:dict
+
+'''
+ref. https://github.com/toposoid/toposoid-knowledgebase-model
+com.ideal.linked.toposoid.knowledgebase.model
+'''
+class KnowledgeFeatureNode(BaseModel):
+    nodeId: str
+    propositionId: str
+    sentenceId: str
+    sentence: str
+    sentenceType:int
+    localContextForFeature: LocalContextForFeature
+    extentText:str
+
+'''
 ref. https://github.com/toposoid/toposoid-deduction-protocol-model
 com.ideal.linked.toposoid.protocol.model.base
 '''
@@ -124,9 +145,7 @@ com.ideal.linked.toposoid.protocol.model.base
 class AnalyzedSentenceObject(BaseModel):
     nodeMap:Dict[str, KnowledgeBaseNode]
     edgeList:List[KnowledgeBaseEdge]
-    sentenceType:int
-    sentenceId:str
-    lang:str
+    knowledgeFeatureNode:KnowledgeFeatureNode
     deductionResultMap:Dict[str, DeductionResult]
 
 '''
