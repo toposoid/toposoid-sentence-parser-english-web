@@ -90,7 +90,7 @@ class SentenceParser():
                 rangeExpressions = rangeExp,
                 categories = {},
                 domains = {},
-                referenceIdMap = {}
+                knowledgeFeatureReferences = []
             )
             
             predicateArgumentStructure = PredicateArgumentStructure(
@@ -117,7 +117,6 @@ class SentenceParser():
                 sentenceId = sentenceId,
                 predicateArgumentStructure = predicateArgumentStructure,
                 localContext = localContext,
-                extentText ="{}"
             )
             nodeMap[sentenceId + "-" + str(token.i)] = node
             
@@ -130,15 +129,14 @@ class SentenceParser():
                     logicType = "-",
                     lang = knowledgeForParser.knowledge.lang
                 ))
-        localContextForFeature = LocalContextForFeature(lang=knowledgeForParser.knowledge.lang, referenceIdMap={})
+        localContextForFeature = LocalContextForFeature(lang=knowledgeForParser.knowledge.lang, knowledgeFeatureReferences=[])
         knowledgeFeatureNode = KnowledgeFeatureNode(
             nodeId = sentenceId, 
             propositionId = propositionId,
             sentenceId = sentenceId,
             sentence = knowledgeForParser.knowledge.sentence,
             sentenceType = sentenceType,
-            localContextForFeature = localContextForFeature,
-            extentText = "{}"
+            localContextForFeature = localContextForFeature,            
         )
         defaultDeductionResult = DeductionResult(status=False,matchedPropositionIds=[], deductionUnit="")
         aso = AnalyzedSentenceObject(nodeMap=nodeMap, edgeList=edgeList, knowledgeFeatureNode=knowledgeFeatureNode, deductionResultMap={"0":defaultDeductionResult, "1":defaultDeductionResult})

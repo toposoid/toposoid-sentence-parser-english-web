@@ -55,13 +55,25 @@ class InputSentenceForParser(BaseModel):
 ref. https://github.com/toposoid/toposoid-knowledgebase-model
 com.ideal.linked.toposoid.knowledgebase.model
 '''
+class KnowledgeFeatureReference(BaseModel):
+    id:str 
+    featureType:int 
+    url:str = ""
+    source:str = ""
+    featureInputType:int = 0    
+    extentText:str = "{}"
+
+'''
+ref. https://github.com/toposoid/toposoid-knowledgebase-model
+com.ideal.linked.toposoid.knowledgebase.model
+'''
 class LocalContext(BaseModel):
     lang: str
     namedEntity: str
     rangeExpressions: dict
     categories: dict
     domains: dict
-    referenceIdMap: dict
+    knowledgeFeatureReferences:List[KnowledgeFeatureReference]
 
 '''
 ref. https://github.com/toposoid/toposoid-knowledgebase-model
@@ -94,7 +106,6 @@ class KnowledgeBaseNode(BaseModel):
     sentenceId:str
     predicateArgumentStructure:PredicateArgumentStructure
     localContext:LocalContext
-    extentText:str  
 
 '''
 ref. https://github.com/toposoid/toposoid-knowledgebase-model
@@ -114,7 +125,7 @@ com.ideal.linked.toposoid.knowledgebase.model
 '''
 class LocalContextForFeature(BaseModel):
     lang: str
-    referenceIdMap:dict
+    knowledgeFeatureReferences:List[KnowledgeFeatureReference]
 
 '''
 ref. https://github.com/toposoid/toposoid-knowledgebase-model
@@ -127,7 +138,6 @@ class KnowledgeFeatureNode(BaseModel):
     sentence: str
     sentenceType:int
     localContextForFeature: LocalContextForFeature
-    extentText:str
 
 '''
 ref. https://github.com/toposoid/toposoid-deduction-protocol-model
