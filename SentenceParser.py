@@ -15,7 +15,7 @@
  '''
 
 import spacy
-from model import KnowledgeForParser, KnowledgeBaseNode, LocalContext, PredicateArgumentStructure, KnowledgeBaseEdge, AnalyzedSentenceObject, DeductionResult
+from model import KnowledgeForParser, KnowledgeBaseNode, LocalContext, PredicateArgumentStructure, KnowledgeBaseEdge, AnalyzedSentenceObject, DeductionResult, LocalContextForFeature, KnowledgeFeatureNode
 from NamedEntityRecognition import NamedEntityRecognition
 import uuid
 
@@ -90,7 +90,7 @@ class SentenceParser():
                 rangeExpressions = rangeExp,
                 categories = {},
                 domains = {},
-                referenceIdMap = {}
+                knowledgeFeatureReferences = []
             )
             
             predicateArgumentStructure = PredicateArgumentStructure(
@@ -117,7 +117,6 @@ class SentenceParser():
                 sentenceId = sentenceId,
                 predicateArgumentStructure = predicateArgumentStructure,
                 localContext = localContext,
-                extentText ="{}"
             )
             nodeMap[sentenceId + "-" + str(token.i)] = node
             
@@ -130,9 +129,17 @@ class SentenceParser():
                     logicType = "-",
                     lang = knowledgeForParser.knowledge.lang
                 ))
-            
+        localContextForFeature = LocalContextForFeature(lang=knowledgeForParser.knowledge.lang, knowledgeFeatureReferences=[])
+        knowledgeFeatureNode = KnowledgeFeatureNode(
+            nodeId = sentenceId, 
+            propositionId = propositionId,
+            sentenceId = sentenceId,
+            sentence = knowledgeForParser.knowledge.sentence,
+            sentenceType = sentenceType,
+            localContextForFeature = localContextForFeature,            
+        )
         defaultDeductionResult = DeductionResult(status=False,matchedPropositionIds=[], deductionUnit="")
-        aso = AnalyzedSentenceObject(nodeMap=nodeMap, edgeList=edgeList, sentenceType=sentenceType, sentenceId=knowledgeForParser.sentenceId, lang=knowledgeForParser.knowledge.lang, deductionResultMap={"0":defaultDeductionResult, "1":defaultDeductionResult})
+        aso = AnalyzedSentenceObject(nodeMap=nodeMap, edgeList=edgeList, knowledgeFeatureNode=knowledgeFeatureNode, deductionResultMap={"0":defaultDeductionResult, "1":defaultDeductionResult})
         return aso
 
     #Get named entity and quantity range representation from words starting with a character index.
