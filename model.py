@@ -163,6 +163,7 @@ class DeductionResult(BaseModel):
     status:bool 
     matchedPropositionInfoList:List[MatchedPropositionInfo]
     deductionUnit:str
+    havePremiseInGivenProposition:bool = False
 
 '''
 ref. https://github.com/toposoid/toposoid-deduction-protocol-model
