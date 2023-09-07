@@ -143,10 +143,27 @@ class KnowledgeFeatureNode(BaseModel):
 ref. https://github.com/toposoid/toposoid-deduction-protocol-model
 com.ideal.linked.toposoid.protocol.model.base
 '''
+class MatchedFeatureInfo(BaseModel):
+    featureId:str
+    similarity:float
+
+'''
+ref. https://github.com/toposoid/toposoid-deduction-protocol-model
+com.ideal.linked.toposoid.protocol.model.base
+'''
+class MatchedPropositionInfo(BaseModel):
+    propositionId:str 
+    featureInfoList:List[MatchedFeatureInfo]
+
+'''
+ref. https://github.com/toposoid/toposoid-deduction-protocol-model
+com.ideal.linked.toposoid.protocol.model.base
+'''
 class DeductionResult(BaseModel):
     status:bool 
-    matchedPropositionIds:List[str]
+    matchedPropositionInfoList:List[MatchedPropositionInfo]
     deductionUnit:str
+    havePremiseInGivenProposition:bool = False
 
 '''
 ref. https://github.com/toposoid/toposoid-deduction-protocol-model

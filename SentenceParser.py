@@ -138,7 +138,7 @@ class SentenceParser():
             sentenceType = sentenceType,
             localContextForFeature = localContextForFeature,            
         )
-        defaultDeductionResult = DeductionResult(status=False,matchedPropositionIds=[], deductionUnit="")
+        defaultDeductionResult = DeductionResult(status=False,matchedPropositionInfoList=[], deductionUnit="")
         aso = AnalyzedSentenceObject(nodeMap=nodeMap, edgeList=edgeList, knowledgeFeatureNode=knowledgeFeatureNode, deductionResultMap={"0":defaultDeductionResult, "1":defaultDeductionResult})
         return aso
 
