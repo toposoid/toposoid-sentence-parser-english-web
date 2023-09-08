@@ -15,7 +15,7 @@
  '''
 
 from fastapi import FastAPI
-from model import InputSentenceForParser, KnowledgeForParser, AnalyzedSentenceObjects
+from model import InputSentenceForParser, KnowledgeForParser, AnalyzedSentenceObjects, Knowledge, SingleSentence, SurfaceList
 from SentenceParser import SentenceParser
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
@@ -29,7 +29,7 @@ import traceback
 
 app = FastAPI(
     title="toposoid-sentence-parser-english-web",
-    version="0.4-SNAPSHOT"
+    version="0.5-SNAPSHOT"
 )
 parser = SentenceParser()
 
@@ -40,17 +40,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"]
 )
-# This API isfor building KnoledgeBase
-'''
-@app.post("/analyzeOneSentence")
-def analyzeOneSentence(knowledgeForParser:KnowledgeForParser):
-    try:
-        aso = parser.parse(knowledgeForParser, "-1")
-        return JSONResponse(content=jsonable_encoder(aso))
-    except Exception as e:
-        LOG.error(traceback.format_exc())
-        return JSONResponse({"status": "ERROR", "message": traceback.format_exc()})
-'''
+
 #This API is for inference
 @app.post("/analyze")
 def analyze(inputSentenceForParser:InputSentenceForParser):
@@ -66,4 +56,18 @@ def analyze(inputSentenceForParser:InputSentenceForParser):
         LOG.error(traceback.format_exc())
         return JSONResponse({"status": "ERROR", "message": traceback.format_exc()})
 
-    
+
+@app.post("/split")
+def split(singleSentence:SingleSentence):
+    try:        
+        if len(singleSentence.sentence) == 0 : return JSONResponse({"status": "ERROR", "message": "It is not possible to register only as a prerequisite. If you have any sentence."}, status_code = 400)
+        knowledge = Knowledge(sentence=singleSentence.sentence, lang="", extentInfoJson="{}", isNegativeSentence=False)
+        knowledgeForParser = KnowledgeForParser(propositionId = "", sentenceId="", knowledge=knowledge)        
+        asos = parser.parse(knowledgeForParser, "1")
+        predicateArgumentStructures = list(map(lambda x: x.predicateArgumentStructure, asos.nodeMap.values()))        
+        candidates = list(filter(lambda x: "NOUN" in x.morphemes or "PROPN" in x.morphemes, predicateArgumentStructures))
+        surfaces = list(map(lambda x: x.surface, candidates))
+        return JSONResponse(content=jsonable_encoder(SurfaceList(surfaces = surfaces)))
+    except Exception as e:
+        LOG.error(traceback.format_exc())
+        return JSONResponse({"status": "ERROR", "message": traceback.format_exc()})
