@@ -16,7 +16,7 @@
 
 from fastapi.testclient import TestClient
 from api import app
-from model import AnalyzedSentenceObject, AnalyzedSentenceObjects
+from model import AnalyzedSentenceObject, AnalyzedSentenceObjects, SurfaceList
 import pytest
 from functools import reduce
 
@@ -302,6 +302,20 @@ def test_IrregularSimpleSentence():
     
     except Exception:
         pytest.fail("Unexpected Error ..")
+
+
+def test_Sprit():
+    try:
+        response = client.post("/split",
+                            headers={"Content-Type": "application/json"},
+                            json={"sentence": "The GrandCanyon was registered as a national park in 1919."})
+        assert response.status_code == 200
+        surfaces = SurfaceList.parse_obj(response.json())
+        assert("GrandCanyon" in surfaces.surfaces and "park" in surfaces.surfaces)
+        print(surfaces)
+    except Exception:
+        pytest.fail("Unexpected Error ..")
+
 
 '''
 def test_SimpleSentenceWithConditionalClauses():

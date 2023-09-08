@@ -181,3 +181,17 @@ com.ideal.linked.toposoid.protocol.model.base
 '''
 class AnalyzedSentenceObjects(BaseModel):
     analyzedSentenceObjects:List[AnalyzedSentenceObject]
+
+'''
+ref. https://github.com/toposoid/toposoid-knowledgebase-model
+com.ideal.linked.toposoid.knowledgebase.nlp.model
+'''
+class SingleSentence(BaseModel):
+    sentence: str
+
+'''
+ref. https://github.com/toposoid/toposoid-knowledgebase-model
+com.ideal.linked.toposoid.knowledgebase.nlp.model
+'''
+class SurfaceList(BaseModel):
+    surfaces: List[str]
