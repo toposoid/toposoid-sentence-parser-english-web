@@ -16,7 +16,7 @@
 
 from fastapi.testclient import TestClient
 from api import app
-from model import AnalyzedSentenceObject, AnalyzedSentenceObjects, SurfaceList
+from model import AnalyzedSentenceObject, AnalyzedSentenceObjects, SurfaceInfo
 import pytest
 from functools import reduce
 
@@ -38,7 +38,7 @@ def test_PremiseAndClaimEmpty():
 def test_PremiseOneSentenceAndClaimEmpty():
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json"},
-                        json={"premise": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "The answer is blown'in the wind.", "lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False}}], "claim": []})    
+                        json={"premise": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "The answer is blown'in the wind.", "lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}], "claim": []})    
     assert response.status_code == 400
     assert "It is not possible to register only as a prerequisite. If you have any premises, please also register a claim." in str(response.json())
 
@@ -46,7 +46,7 @@ def test_PremiseOneSentenceAndClaimEmpty():
 def test_PremiseEnmptyAndClaimOneSentence():
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json"},
-                        json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "The answer is blown'in the wind.","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False}}]})    
+                        json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "The answer is blown'in the wind.","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}]})    
     assert response.status_code == 200
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     assert len(asos.analyzedSentenceObjects) == 1
@@ -60,7 +60,7 @@ def test_PremiseEnmptyAndClaimOneSentence():
 def test_NegativeSimpleSentence():
     response = client.post("/analyze",
                             headers={"Content-Type": "application/json"},
-                            json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge": {"sentence": "The problem does not seem soluble.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False}}]})    
+                            json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge": {"sentence": "The problem does not seem soluble.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}]})    
     assert response.status_code == 200
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     for aso in asos.analyzedSentenceObjects:
@@ -81,7 +81,7 @@ def test_NegativeSimpleSentence():
 def test_PremiseOneSentencetyAndClaimOneSentence():
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json"},
-                        json={"premise": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "You may say I'm a dreamer, But I'm not the only one.","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False}}], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "I hope someday you'll join us And the world will live as one.","lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False}}]})    
+                        json={"premise": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "You may say I'm a dreamer, But I'm not the only one.","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "I hope someday you'll join us And the world will live as one.","lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}]})    
     assert response.status_code == 200
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     assert len(asos.analyzedSentenceObjects) == 2
@@ -98,7 +98,7 @@ def test_PremiseOneSentencetyAndClaimOneSentence():
 def test_PremiseMultipleSentencetyAndClaimMultipleSentence():
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json"},
-                        json={"premise": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "Just The Way You Are!","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False}}, {"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "The answer is blown'in the wind.","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False}}], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "You may say I'm a dreamer, But I'm not the only one.","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False}}, {"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "I hope someday you'll join us And the world will live as one.","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False}}]})    
+                        json={"premise": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "Just The Way You Are!","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}, {"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "The answer is blown'in the wind.","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "You may say I'm a dreamer, But I'm not the only one.","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}, {"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "I hope someday you'll join us And the world will live as one.","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}]})    
     assert response.status_code == 200
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     assert len(asos.analyzedSentenceObjects) == 4
@@ -116,7 +116,7 @@ def test_PremiseMultipleSentencetyAndClaimMultipleSentence():
 def test_SimpleSentenceWithQuantitativeExpressions0():
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json"},
-                        json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge": {"sentence": "His weight is 70kg.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False}}]})    
+                        json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge": {"sentence": "His weight is 70kg.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}]})    
     assert response.status_code == 200
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     for aso in asos.analyzedSentenceObjects:
@@ -145,7 +145,7 @@ def test_SimpleSentenceWithQuantitativeExpressions0():
 def test_SimpleSentenceWithQuantitativeExpressions1():
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json"},
-                        json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "His weight is over 70kg.","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False}}]})                           
+                        json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "His weight is over 70kg.","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}]})                           
     assert response.status_code == 200
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     for aso in asos.analyzedSentenceObjects:
@@ -175,7 +175,7 @@ def test_SimpleSentenceWithQuantitativeExpressions1():
 def test_SimpleSentenceWithQuantitativeExpressions2():
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json"},
-                        json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "Its stock price has risen by more than $ 10.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False}}]})    
+                        json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "Its stock price has risen by more than $ 10.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}]})    
     assert response.status_code == 200
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     for aso in asos.analyzedSentenceObjects:
@@ -205,7 +205,7 @@ def test_SimpleSentenceWithQuantitativeExpressions2():
 def test_SimpleSentenceWithQuantitativeExpressions3():
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json"},
-                        json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "The height limit is 170cm.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False}}]})    
+                        json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "The height limit is 170cm.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}]})    
     assert response.status_code == 200
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     for aso in asos.analyzedSentenceObjects:
@@ -235,7 +235,7 @@ def test_SimpleSentenceWithQuantitativeExpressions3():
 def test_SimpleSentenceWithQuantitativeExpressions4():
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json"},
-                        json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "The deadline was April 1, 2022.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False}}]})    
+                        json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "The deadline was April 1, 2022.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}]})    
     #The deadline was April 1, 2022.
     #The deadline is from April 2022 to April 2023.
     assert response.status_code == 200
@@ -265,7 +265,7 @@ def test_SimpleSentenceWithQuantitativeExpressions4():
 def test_SimpleSentenceWithQuantitativeExpressions5():
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json"},
-                        json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "The deadline was 23:59:59.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False}}]})    
+                        json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "The deadline was 23:59:59.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}]})    
     assert response.status_code == 200
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     for aso in asos.analyzedSentenceObjects:
@@ -296,7 +296,7 @@ def test_IrregularSimpleSentence():
     try:
         response = client.post("/analyze",
                             headers={"Content-Type": "application/json"},
-                            json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge": {"sentence": "!#$%&Y'\"UIO\n strange =*+<H`OJWKFHgb", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False}}]})    
+                            json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge": {"sentence": "!#$%&Y'\"UIO\n strange =*+<H`OJWKFHgb", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}]})    
         assert response.status_code == 200
         asos = AnalyzedSentenceObjects.parse_obj(response.json())
     
@@ -310,9 +310,9 @@ def test_Sprit():
                             headers={"Content-Type": "application/json"},
                             json={"sentence": "The GrandCanyon was registered as a national park in 1919."})
         assert response.status_code == 200
-        surfaces = SurfaceList.parse_obj(response.json())
-        assert("GrandCanyon" in surfaces.surfaces and "park" in surfaces.surfaces)
-        print(surfaces)
+        print(response.json())
+        correctJson = [{'surface': 'GrandCanyon', 'index': 1}, {'surface': 'park', 'index': 7}]        
+        assert(response.json()==correctJson)
     except Exception:
         pytest.fail("Unexpected Error ..")
 

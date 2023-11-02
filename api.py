@@ -15,7 +15,7 @@
  '''
 
 from fastapi import FastAPI
-from model import InputSentenceForParser, KnowledgeForParser, AnalyzedSentenceObjects, Knowledge, SingleSentence, SurfaceList
+from model import InputSentenceForParser, KnowledgeForParser, AnalyzedSentenceObjects, Knowledge, SingleSentence, SurfaceInfo
 from SentenceParser import SentenceParser
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
@@ -56,7 +56,6 @@ def analyze(inputSentenceForParser:InputSentenceForParser):
         LOG.error(traceback.format_exc())
         return JSONResponse({"status": "ERROR", "message": traceback.format_exc()})
 
-
 @app.post("/split")
 def split(singleSentence:SingleSentence):
     try:        
@@ -66,8 +65,8 @@ def split(singleSentence:SingleSentence):
         asos = parser.parse(knowledgeForParser, "1")
         predicateArgumentStructures = list(map(lambda x: x.predicateArgumentStructure, asos.nodeMap.values()))        
         candidates = list(filter(lambda x: "NOUN" in x.morphemes or "PROPN" in x.morphemes, predicateArgumentStructures))
-        surfaces = list(map(lambda x: x.surface, candidates))
-        return JSONResponse(content=jsonable_encoder(SurfaceList(surfaces = surfaces)))
+        surfaceInfoList = list(map(lambda x: SurfaceInfo(surface=x.surface,index= x.currentId), candidates))
+        return JSONResponse(content=jsonable_encoder(surfaceInfoList))
     except Exception as e:
         LOG.error(traceback.format_exc())
         return JSONResponse({"status": "ERROR", "message": traceback.format_exc()})

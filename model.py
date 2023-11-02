@@ -21,11 +21,42 @@ from typing import Dict, List
 ref. https://github.com/toposoid/toposoid-knowledgebase-model
 com.ideal.linked.toposoid.knowledgebase.regist.model
 '''
+class Reference(BaseModel):
+    url:str
+    surface:str 
+    surfaceIndex:int 
+    isWholeSentence:bool
+    originalUrlOrReference:str
+
+'''
+ref. https://github.com/toposoid/toposoid-knowledgebase-model
+com.ideal.linked.toposoid.knowledgebase.regist.model
+'''
+class ImageReference(BaseModel):
+    reference:Reference
+    x:int
+    y:int
+    weight:int 
+    height:int
+
+'''
+ref. https://github.com/toposoid/toposoid-knowledgebase-model
+com.ideal.linked.toposoid.knowledgebase.regist.model
+'''
+class KnowledgeForImage(BaseModel):
+    id:str
+    imageReference:ImageReference
+
+'''
+ref. https://github.com/toposoid/toposoid-knowledgebase-model
+com.ideal.linked.toposoid.knowledgebase.regist.model
+'''
 class Knowledge(BaseModel):
     sentence:str
     lang:str
     extentInfoJson:str
     isNegativeSentence:bool
+    knowledgeForImages:List[KnowledgeForImage] = []
 
 '''
 ref. https://github.com/toposoid/toposoid-deduction-protocol-model
@@ -193,5 +224,6 @@ class SingleSentence(BaseModel):
 ref. https://github.com/toposoid/toposoid-knowledgebase-model
 com.ideal.linked.toposoid.knowledgebase.nlp.model
 '''
-class SurfaceList(BaseModel):
-    surfaces: List[str]
+class SurfaceInfo(BaseModel):
+   surface: str
+   index: int 
