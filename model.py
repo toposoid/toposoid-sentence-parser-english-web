@@ -162,7 +162,7 @@ class LocalContextForFeature(BaseModel):
 ref. https://github.com/toposoid/toposoid-knowledgebase-model
 com.ideal.linked.toposoid.knowledgebase.model
 '''
-class KnowledgeFeatureNode(BaseModel):
+class KnowledgeBaseSemiGlobalNode(BaseModel):
     nodeId: str
     propositionId: str
     sentenceId: str
@@ -203,7 +203,7 @@ com.ideal.linked.toposoid.protocol.model.base
 class AnalyzedSentenceObject(BaseModel):
     nodeMap:Dict[str, KnowledgeBaseNode]
     edgeList:List[KnowledgeBaseEdge]
-    knowledgeFeatureNode:KnowledgeFeatureNode
+    knowledgeBaseSemiGlobalNode:KnowledgeBaseSemiGlobalNode
     deductionResultMap:Dict[str, DeductionResult]
 
 '''

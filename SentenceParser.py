@@ -15,7 +15,7 @@
  '''
 
 import spacy
-from model import KnowledgeForParser, KnowledgeBaseNode, LocalContext, PredicateArgumentStructure, KnowledgeBaseEdge, AnalyzedSentenceObject, DeductionResult, LocalContextForFeature, KnowledgeFeatureNode
+from model import KnowledgeForParser, KnowledgeBaseNode, LocalContext, PredicateArgumentStructure, KnowledgeBaseEdge, AnalyzedSentenceObject, DeductionResult, LocalContextForFeature, KnowledgeBaseSemiGlobalNode
 from NamedEntityRecognition import NamedEntityRecognition
 import uuid
 
@@ -130,7 +130,7 @@ class SentenceParser():
                     lang = knowledgeForParser.knowledge.lang
                 ))
         localContextForFeature = LocalContextForFeature(lang=knowledgeForParser.knowledge.lang, knowledgeFeatureReferences=[])
-        knowledgeFeatureNode = KnowledgeFeatureNode(
+        knowledgeBaseSemiGlobalNode = KnowledgeBaseSemiGlobalNode(
             nodeId = sentenceId, 
             propositionId = propositionId,
             sentenceId = sentenceId,
@@ -139,7 +139,7 @@ class SentenceParser():
             localContextForFeature = localContextForFeature,            
         )
         defaultDeductionResult = DeductionResult(status=False,matchedPropositionInfoList=[], deductionUnit="")
-        aso = AnalyzedSentenceObject(nodeMap=nodeMap, edgeList=edgeList, knowledgeFeatureNode=knowledgeFeatureNode, deductionResultMap={"0":defaultDeductionResult, "1":defaultDeductionResult})
+        aso = AnalyzedSentenceObject(nodeMap=nodeMap, edgeList=edgeList, knowledgeBaseSemiGlobalNode=knowledgeBaseSemiGlobalNode, deductionResultMap={"0":defaultDeductionResult, "1":defaultDeductionResult})
         return aso
 
     #Get named entity and quantity range representation from words starting with a character index.
