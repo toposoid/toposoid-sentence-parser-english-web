@@ -190,10 +190,38 @@ class MatchedPropositionInfo(BaseModel):
 ref. https://github.com/toposoid/toposoid-deduction-protocol-model
 com.ideal.linked.toposoid.protocol.model.base
 '''
+class CoveredPropositionNode(BaseModel):
+    currentId:str
+    propositionCurrentId:str
+    surface:str
+
+'''
+ref. https://github.com/toposoid/toposoid-deduction-protocol-model
+com.ideal.linked.toposoid.protocol.model.base
+'''
+class CoveredPropositionEdge(BaseModel):
+    sourceNode:CoveredPropositionNode
+    destinationNode:CoveredPropositionNode
+
+'''
+ref. https://github.com/toposoid/toposoid-deduction-protocol-model
+com.ideal.linked.toposoid.protocol.model.base
+'''
+class CoveredPropositionResult(BaseModel):
+    deductionUnit:str
+    propositionId:str 
+    sentenceId:str
+    coveredPropositionEdges:List[CoveredPropositionEdge]
+
+'''
+ref. https://github.com/toposoid/toposoid-deduction-protocol-model
+com.ideal.linked.toposoid.protocol.model.base
+'''
 class DeductionResult(BaseModel):
     status:bool 
     matchedPropositionInfoList:List[MatchedPropositionInfo]
     deductionUnit:str
+    coveredPropositionResult:CoveredPropositionResult
     havePremiseInGivenProposition:bool = False
 
 '''
@@ -204,7 +232,7 @@ class AnalyzedSentenceObject(BaseModel):
     nodeMap:Dict[str, KnowledgeBaseNode]
     edgeList:List[KnowledgeBaseEdge]
     knowledgeBaseSemiGlobalNode:KnowledgeBaseSemiGlobalNode
-    deductionResultMap:Dict[str, DeductionResult]
+    deductionResult:DeductionResult
 
 '''
 ref. https://github.com/toposoid/toposoid-deduction-protocol-model
