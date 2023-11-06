@@ -190,10 +190,9 @@ class MatchedPropositionInfo(BaseModel):
 ref. https://github.com/toposoid/toposoid-deduction-protocol-model
 com.ideal.linked.toposoid.protocol.model.base
 '''
-class CoveredPropositionNode(BaseModel):
-    currentId:str
+class CoveredPropositionNode(BaseModel):    
     propositionCurrentId:str
-    surface:str
+    propositionSurface:str
 
 '''
 ref. https://github.com/toposoid/toposoid-deduction-protocol-model
