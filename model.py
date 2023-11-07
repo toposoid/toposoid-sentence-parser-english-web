@@ -191,8 +191,9 @@ ref. https://github.com/toposoid/toposoid-deduction-protocol-model
 com.ideal.linked.toposoid.protocol.model.base
 '''
 class CoveredPropositionNode(BaseModel):    
-    propositionCurrentId:str
-    propositionSurface:str
+    terminalId:str
+    terminalSurface:str
+    terminalUrl:str
 
 '''
 ref. https://github.com/toposoid/toposoid-deduction-protocol-model
