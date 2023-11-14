@@ -106,7 +106,7 @@ class SentenceParser():
                 surfaceYomi = "",
                 normalizedNameYomi = "",
                 modalityType =  "-",
-                logicType = "-",
+                parallelType = "-",
                 nodeType = nodeType,
                 morphemes = [token.pos_]
             )
@@ -126,8 +126,9 @@ class SentenceParser():
                     destinationId = sentenceId + "-" + str(token.head.i),
                     caseStr = token.dep_,
                     dependType = "-",
-                    logicType = "-",
-                    lang = knowledgeForParser.knowledge.lang
+                    parallelType = "-",
+                    hasInclusion = isConditionalConnection,
+                    logicType = "-"                    
                 ))
         localContextForFeature = LocalContextForFeature(lang=knowledgeForParser.knowledge.lang, knowledgeFeatureReferences=[])
         knowledgeBaseSemiGlobalNode = KnowledgeBaseSemiGlobalNode(
