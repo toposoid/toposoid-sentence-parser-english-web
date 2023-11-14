@@ -123,7 +123,7 @@ class PredicateArgumentStructure(BaseModel):
     normalizedNameYomi:str
     surfaceYomi:str
     modalityType:str
-    logicType:str
+    parallelType:str
     nodeType:int
     morphemes:List[str]
 
@@ -147,8 +147,9 @@ class KnowledgeBaseEdge(BaseModel):
     destinationId:str 
     caseStr:str
     dependType:str
+    parallelType:str
+    hasInclusion:bool
     logicType:str
-    lang:str
 
 '''
 ref. https://github.com/toposoid/toposoid-knowledgebase-model
