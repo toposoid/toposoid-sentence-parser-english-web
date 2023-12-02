@@ -221,8 +221,7 @@ com.ideal.linked.toposoid.protocol.model.base
 class DeductionResult(BaseModel):
     status:bool 
     matchedPropositionInfoList:List[MatchedPropositionInfo]
-    deductionUnit:str
-    coveredPropositionResult:CoveredPropositionResult
+    coveredPropositionResults:List[CoveredPropositionResult]
     havePremiseInGivenProposition:bool = False
 
 '''
