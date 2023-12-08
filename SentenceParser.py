@@ -140,13 +140,6 @@ class SentenceParser():
             localContextForFeature = localContextForFeature,            
         )
 
-        #coveredPropositionResult = CoveredPropositionResult(
-        #  deductionUnit = "",
-        #  propositionId= knowledgeForParser.propositionId,
-        #  sentenceId =knowledgeForParser.sentenceId,
-        #  coveredPropositionEdges = []
-        #)
-
         defaultDeductionResult = DeductionResult(status=False,matchedPropositionInfoList=[], coveredPropositionResults = [])
         aso = AnalyzedSentenceObject(nodeMap=nodeMap, edgeList=edgeList, knowledgeBaseSemiGlobalNode=knowledgeBaseSemiGlobalNode, deductionResult=defaultDeductionResult)
         return aso
