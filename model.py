@@ -208,11 +208,20 @@ class CoveredPropositionEdge(BaseModel):
 ref. https://github.com/toposoid/toposoid-deduction-protocol-model
 com.ideal.linked.toposoid.protocol.model.base
 '''
+class KnowledgeBaseSideInfo(BaseModel):
+    propositionId:str
+    sentenceId:str
+
+'''
+ref. https://github.com/toposoid/toposoid-deduction-protocol-model
+com.ideal.linked.toposoid.protocol.model.base
+'''
 class CoveredPropositionResult(BaseModel):
     deductionUnit:str
     propositionId:str 
     sentenceId:str
     coveredPropositionEdges:List[CoveredPropositionEdge]
+    knowledgeBaseSideInfo:KnowledgeBaseSideInfo
 
 '''
 ref. https://github.com/toposoid/toposoid-deduction-protocol-model
