@@ -185,6 +185,7 @@ com.ideal.linked.toposoid.protocol.model.base
 '''
 class MatchedPropositionInfo(BaseModel):
     propositionId:str 
+    sentenceId:str
     featureInfoList:List[MatchedFeatureInfo]
 
 '''
