@@ -140,7 +140,7 @@ class SentenceParser():
             localContextForFeature = localContextForFeature,            
         )
 
-        defaultDeductionResult = DeductionResult(status=False,matchedPropositionInfoList=[], coveredPropositionResults = [])
+        defaultDeductionResult = DeductionResult(status=False, coveredPropositionResults = [])
         aso = AnalyzedSentenceObject(nodeMap=nodeMap, edgeList=edgeList, knowledgeBaseSemiGlobalNode=knowledgeBaseSemiGlobalNode, deductionResult=defaultDeductionResult)
         return aso
 

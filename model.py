@@ -183,15 +183,6 @@ class MatchedFeatureInfo(BaseModel):
 ref. https://github.com/toposoid/toposoid-deduction-protocol-model
 com.ideal.linked.toposoid.protocol.model.base
 '''
-class MatchedPropositionInfo(BaseModel):
-    propositionId:str 
-    sentenceId:str
-    featureInfoList:List[MatchedFeatureInfo]
-
-'''
-ref. https://github.com/toposoid/toposoid-deduction-protocol-model
-com.ideal.linked.toposoid.protocol.model.base
-'''
 class CoveredPropositionNode(BaseModel):    
     terminalId:str
     terminalSurface:str
@@ -212,6 +203,8 @@ com.ideal.linked.toposoid.protocol.model.base
 class KnowledgeBaseSideInfo(BaseModel):
     propositionId:str
     sentenceId:str
+    featureInfoList:List[MatchedFeatureInfo]
+
 
 '''
 ref. https://github.com/toposoid/toposoid-deduction-protocol-model
@@ -230,7 +223,6 @@ com.ideal.linked.toposoid.protocol.model.base
 '''
 class DeductionResult(BaseModel):
     status:bool 
-    matchedPropositionInfoList:List[MatchedPropositionInfo]
     coveredPropositionResults:List[CoveredPropositionResult]
     havePremiseInGivenProposition:bool = False
 
