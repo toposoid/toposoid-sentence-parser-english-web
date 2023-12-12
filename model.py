@@ -215,7 +215,7 @@ class CoveredPropositionResult(BaseModel):
     propositionId:str 
     sentenceId:str
     coveredPropositionEdges:List[CoveredPropositionEdge]
-    knowledgeBaseSideInfo:KnowledgeBaseSideInfo
+    knowledgeBaseSideInfo:List[KnowledgeBaseSideInfo]
 
 '''
 ref. https://github.com/toposoid/toposoid-deduction-protocol-model
