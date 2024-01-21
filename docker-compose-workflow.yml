@@ -12,7 +12,8 @@ services:
     image: toposoid-sentence-parser-english-web:0.5-SNAPSHOT
     tty: true
     environment:
-      - CORENLP_HOST=172.30.0.3
+      - TOPOSOID_CORENLP_HOST=172.30.0.3
+      - TOPOSOID_PARSER_SPACY_MODEL_EN=en_core_web_md
     networks:
       app_net:
         ipv4_address: 172.30.0.2

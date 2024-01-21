@@ -18,6 +18,7 @@ import spacy
 from model import KnowledgeForParser, KnowledgeBaseNode, LocalContext, PredicateArgumentStructure, KnowledgeBaseEdge, AnalyzedSentenceObject, DeductionResult, LocalContextForFeature, KnowledgeBaseSemiGlobalNode, CoveredPropositionResult, CoveredPropositionEdge
 from NamedEntityRecognition import NamedEntityRecognition
 import uuid
+import os
 
 #This module takes a sentence as input and returns the words of dependencies
 class SentenceParser():
@@ -26,7 +27,7 @@ class SentenceParser():
     namedEntityRecognition = None
 
     def __init__(self):
-        self.nlp = spacy.load('en_core_web_lg')
+        self.nlp = spacy.load(os.environ["TOPOSOID_PARSER_SPACY_MODEL_EN"])
         self.namedEntityRecognition = NamedEntityRecognition()
 
     #Get negative expressions and clause expressions in sentences

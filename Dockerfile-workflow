@@ -11,6 +11,6 @@ RUN apt-get update \
 && git fetch origin ${TARGET_BRANCH} \
 && git checkout ${TARGET_BRANCH} \
 && pip install --no-cache-dir --trusted-host pypi.python.org -r requirements.txt \
-&& python -m spacy download en_core_web_lg 
+&& python -m spacy download en_core_web_md 
 
 
