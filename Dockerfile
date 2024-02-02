@@ -2,6 +2,7 @@ FROM python:3.9.16
 
 WORKDIR /app
 ARG TARGET_BRANCH
+ARG PIPELINES_MODEL
 ENV DEPLOYMENT=local
 
 RUN apt-get update \
@@ -11,7 +12,7 @@ RUN apt-get update \
 && git fetch origin ${TARGET_BRANCH} \
 && git checkout ${TARGET_BRANCH} \
 && pip install --no-cache-dir --trusted-host pypi.python.org -r requirements.txt \
-&& python -m spacy download en_core_web_lg 
+&& python -m spacy download ${PIPELINES_MODEL}
 
 
 
