@@ -22,6 +22,8 @@ jobs:
             docker build --build-arg TARGET_BRANCH=${{ env.PJ_BRANCH }} --build-arg PIPELINES_MODEL=en_core_web_md --tag ${{ env.PJ_REPO }}:${{ env.PJ_VERSION }} -f Dockerfile-workflow .
             docker-compose -f docker-compose-workflow.yml up -d
             docker-compose -f docker-compose-workflow.yml exec -T ${{ env.PJ_REPO }} bash -c "cd ${{ env.PJ_REPO }} && pytest"
+            docker rm --force $(docker ps -a -q) > /dev/null 2>&1 && :
+            docker rmi --force ${{ env.PJ_REPO }}:${{ env.PJ_VERSION }}> /dev/null 2>&1 && :
       - name: Docker meta
         id: docker_meta
         uses: crazy-max/ghaction-docker-meta@v3

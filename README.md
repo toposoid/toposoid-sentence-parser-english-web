@@ -5,22 +5,22 @@ This Microservice analyzes dependency's structure of English sentences and outpu
 
 [![Test And Build](https://github.com/toposoid/toposoid-sentence-parser-english-web/actions/workflows/action.yml/badge.svg)](https://github.com/toposoid/toposoid-sentence-parser-english-web/actions/workflows/action.yml)
 
-<img width="1084" src="https://user-images.githubusercontent.com/82787843/212469366-6d527b9f-e978-488b-938a-447cec87d199.png">
+<img width="1151"  src="https://github.com/toposoid/toposoid-sentence-parser-english-web/assets/82787843/622291ce-a45c-4161-aec9-53460833aea0">
 
 
 ## Requirements
 * Docker version 20.10.x, or later
 * docker-compose version 1.22.x
 
-### Memory requirements
-* Required: at least 6GB of RAM
-* Required: 10G or higher of HDD
+### Memory requirements For Standalone
+* Required: at least 3GB of RAM
+* Required: at least 1.24GB of HDD(Docker Image Size)
 
-## Setup
+## Setup For Standalone
 ```bssh
 docker-compose up -d
 ```
-It takes more than 20 minutes to pull the Docker image for the first time.
+The first startup takes a long time until docker pull finishes.
 
 ## Usage
 ```bash
@@ -34,7 +34,8 @@ curl -X POST -H "Content-Type: application/json" -d '{
                 "sentence": "This is a test.",
                 "lang": "en_US",
                 "extentInfoJson": "{}",
-                "isNegativeSentence": false
+                "isNegativeSentence": false,
+                "knowledgeForImages": []
             }
         }
     ]
