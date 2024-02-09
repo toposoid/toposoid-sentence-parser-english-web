@@ -36,7 +36,7 @@ class ImageReference(BaseModel):
     reference:Reference
     x:int
     y:int
-    weight:int 
+    width:int 
     height:int
 
 '''
