@@ -9,6 +9,6 @@ services:
     ports:
       - 9007:9007
   corenlp:
-    image: toposoid/corenlp:3.4.2-lowspec
+    image: toposoid/corenlp:3.4.2
     ports:
       - 9000:9000
