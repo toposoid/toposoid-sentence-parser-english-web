@@ -21,11 +21,42 @@ from typing import Dict, List
 ref. https://github.com/toposoid/toposoid-knowledgebase-model
 com.ideal.linked.toposoid.knowledgebase.regist.model
 '''
+class Reference(BaseModel):
+    url:str
+    surface:str 
+    surfaceIndex:int 
+    isWholeSentence:bool
+    originalUrlOrReference:str
+
+'''
+ref. https://github.com/toposoid/toposoid-knowledgebase-model
+com.ideal.linked.toposoid.knowledgebase.regist.model
+'''
+class ImageReference(BaseModel):
+    reference:Reference
+    x:int
+    y:int
+    width:int 
+    height:int
+
+'''
+ref. https://github.com/toposoid/toposoid-knowledgebase-model
+com.ideal.linked.toposoid.knowledgebase.regist.model
+'''
+class KnowledgeForImage(BaseModel):
+    id:str
+    imageReference:ImageReference
+
+'''
+ref. https://github.com/toposoid/toposoid-knowledgebase-model
+com.ideal.linked.toposoid.knowledgebase.regist.model
+'''
 class Knowledge(BaseModel):
     sentence:str
     lang:str
     extentInfoJson:str
     isNegativeSentence:bool
+    knowledgeForImages:List[KnowledgeForImage] = []
 
 '''
 ref. https://github.com/toposoid/toposoid-deduction-protocol-model
@@ -55,9 +86,31 @@ class InputSentenceForParser(BaseModel):
 ref. https://github.com/toposoid/toposoid-knowledgebase-model
 com.ideal.linked.toposoid.knowledgebase.model
 '''
-class KnowledgeBaseNode(BaseModel):
-    nodeId:str
-    propositionId:str
+class KnowledgeFeatureReference(BaseModel):
+    id:str 
+    featureType:int 
+    url:str = ""
+    source:str = ""
+    featureInputType:int = 0    
+    extentText:str = "{}"
+
+'''
+ref. https://github.com/toposoid/toposoid-knowledgebase-model
+com.ideal.linked.toposoid.knowledgebase.model
+'''
+class LocalContext(BaseModel):
+    lang: str
+    namedEntity: str
+    rangeExpressions: dict
+    categories: dict
+    domains: dict
+    knowledgeFeatureReferences:List[KnowledgeFeatureReference]
+
+'''
+ref. https://github.com/toposoid/toposoid-knowledgebase-model
+com.ideal.linked.toposoid.knowledgebase.model
+'''
+class PredicateArgumentStructure(BaseModel):
     currentId:int
     parentId:int
     isMainSection:bool
@@ -65,19 +118,25 @@ class KnowledgeBaseNode(BaseModel):
     normalizedName:str
     dependType:str
     caseType:str
-    namedEntity:str
-    rangeExpressions:dict
-    categories:dict
-    domains:dict
     isDenialWord:bool
     isConditionalConnection:bool
     normalizedNameYomi:str
     surfaceYomi:str
     modalityType:str
-    logicType:str
+    parallelType:str
     nodeType:int
-    lang:str
-    extentText:str  
+    morphemes:List[str]
+
+'''
+ref. https://github.com/toposoid/toposoid-knowledgebase-model
+com.ideal.linked.toposoid.knowledgebase.model
+'''
+class KnowledgeBaseNode(BaseModel):
+    nodeId:str
+    propositionId:str
+    sentenceId:str
+    predicateArgumentStructure:PredicateArgumentStructure
+    localContext:LocalContext
 
 '''
 ref. https://github.com/toposoid/toposoid-knowledgebase-model
@@ -88,8 +147,75 @@ class KnowledgeBaseEdge(BaseModel):
     destinationId:str 
     caseStr:str
     dependType:str
+    parallelType:str
+    hasInclusion:bool
     logicType:str
-    lang:str
+
+'''
+ref. https://github.com/toposoid/toposoid-knowledgebase-model
+com.ideal.linked.toposoid.knowledgebase.model
+'''
+class LocalContextForFeature(BaseModel):
+    lang: str
+    knowledgeFeatureReferences:List[KnowledgeFeatureReference]
+
+'''
+ref. https://github.com/toposoid/toposoid-knowledgebase-model
+com.ideal.linked.toposoid.knowledgebase.model
+'''
+class KnowledgeBaseSemiGlobalNode(BaseModel):
+    nodeId: str
+    propositionId: str
+    sentenceId: str
+    sentence: str
+    sentenceType:int
+    localContextForFeature: LocalContextForFeature
+
+'''
+ref. https://github.com/toposoid/toposoid-deduction-protocol-model
+com.ideal.linked.toposoid.protocol.model.base
+'''
+class MatchedFeatureInfo(BaseModel):
+    featureId:str
+    similarity:float
+
+'''
+ref. https://github.com/toposoid/toposoid-deduction-protocol-model
+com.ideal.linked.toposoid.protocol.model.base
+'''
+class CoveredPropositionNode(BaseModel):    
+    terminalId:str
+    terminalSurface:str
+    terminalUrl:str
+
+'''
+ref. https://github.com/toposoid/toposoid-deduction-protocol-model
+com.ideal.linked.toposoid.protocol.model.base
+'''
+class CoveredPropositionEdge(BaseModel):
+    sourceNode:CoveredPropositionNode
+    destinationNode:CoveredPropositionNode
+
+'''
+ref. https://github.com/toposoid/toposoid-deduction-protocol-model
+com.ideal.linked.toposoid.protocol.model.base
+'''
+class KnowledgeBaseSideInfo(BaseModel):
+    propositionId:str
+    sentenceId:str
+    featureInfoList:List[MatchedFeatureInfo]
+
+
+'''
+ref. https://github.com/toposoid/toposoid-deduction-protocol-model
+com.ideal.linked.toposoid.protocol.model.base
+'''
+class CoveredPropositionResult(BaseModel):
+    deductionUnit:str
+    propositionId:str 
+    sentenceId:str
+    coveredPropositionEdges:List[CoveredPropositionEdge]
+    knowledgeBaseSideInfo:List[KnowledgeBaseSideInfo]
 
 '''
 ref. https://github.com/toposoid/toposoid-deduction-protocol-model
@@ -97,8 +223,8 @@ com.ideal.linked.toposoid.protocol.model.base
 '''
 class DeductionResult(BaseModel):
     status:bool 
-    matchedPropositionIds:List[str]
-    deductionUnit:str
+    coveredPropositionResults:List[CoveredPropositionResult]
+    havePremiseInGivenProposition:bool = False
 
 '''
 ref. https://github.com/toposoid/toposoid-deduction-protocol-model
@@ -107,10 +233,8 @@ com.ideal.linked.toposoid.protocol.model.base
 class AnalyzedSentenceObject(BaseModel):
     nodeMap:Dict[str, KnowledgeBaseNode]
     edgeList:List[KnowledgeBaseEdge]
-    sentenceType:int
-    sentenceId:str
-    lang:str
-    deductionResultMap:Dict[str, DeductionResult]
+    knowledgeBaseSemiGlobalNode:KnowledgeBaseSemiGlobalNode
+    deductionResult:DeductionResult
 
 '''
 ref. https://github.com/toposoid/toposoid-deduction-protocol-model
@@ -118,3 +242,18 @@ com.ideal.linked.toposoid.protocol.model.base
 '''
 class AnalyzedSentenceObjects(BaseModel):
     analyzedSentenceObjects:List[AnalyzedSentenceObject]
+
+'''
+ref. https://github.com/toposoid/toposoid-knowledgebase-model
+com.ideal.linked.toposoid.knowledgebase.nlp.model
+'''
+class SingleSentence(BaseModel):
+    sentence: str
+
+'''
+ref. https://github.com/toposoid/toposoid-knowledgebase-model
+com.ideal.linked.toposoid.knowledgebase.nlp.model
+'''
+class SurfaceInfo(BaseModel):
+   surface: str
+   index: int 

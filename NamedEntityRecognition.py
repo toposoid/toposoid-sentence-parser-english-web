@@ -24,7 +24,7 @@ from unit import getUnitAndPrefixSymbol
 class NamedEntityRecognition():
        
     def __init__(self):
-        self.url = "http://" + os.environ["CORENLP_HOST"] + ":9000"        
+        self.url = "http://" + os.environ["TOPOSOID_CORENLP_HOST"] + ":9000"        
         self.headers = {'content-type': 'text/plain'}
 
     def getNerAndSpanExpression(self, sentence):

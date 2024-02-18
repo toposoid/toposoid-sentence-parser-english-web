@@ -15,9 +15,10 @@
  '''
 
 import spacy
-from model import KnowledgeForParser, KnowledgeBaseNode, KnowledgeBaseEdge, AnalyzedSentenceObject, DeductionResult
+from model import KnowledgeForParser, KnowledgeBaseNode, LocalContext, PredicateArgumentStructure, KnowledgeBaseEdge, AnalyzedSentenceObject, DeductionResult, LocalContextForFeature, KnowledgeBaseSemiGlobalNode, CoveredPropositionResult, CoveredPropositionEdge
 from NamedEntityRecognition import NamedEntityRecognition
 import uuid
+import os
 
 #This module takes a sentence as input and returns the words of dependencies
 class SentenceParser():
@@ -26,7 +27,7 @@ class SentenceParser():
     namedEntityRecognition = None
 
     def __init__(self):
-        self.nlp = spacy.load('en_core_web_lg')
+        self.nlp = spacy.load(os.environ["TOPOSOID_PARSER_SPACY_MODEL_EN"])
         self.namedEntityRecognition = NamedEntityRecognition()
 
     #Get negative expressions and clause expressions in sentences
@@ -84,9 +85,16 @@ class SentenceParser():
             nerExp, rangeExp = self.extractNerAndRange(beginIndex, nerInfo)
             beginIndex = beginIndex + len(token.text) + 1
 
-            node = KnowledgeBaseNode(
-                nodeId = sentenceId + "-" + str(token.i),
-                propositionId = propositionId,
+            localContext = LocalContext(
+                lang = knowledgeForParser.knowledge.lang,
+                namedEntity = nerExp,
+                rangeExpressions = rangeExp,
+                categories = {},
+                domains = {},
+                knowledgeFeatureReferences = []
+            )
+            
+            predicateArgumentStructure = PredicateArgumentStructure(
                 currentId = token.i,
                 parentId = token.head.i,
                 isMainSection = True,
@@ -94,19 +102,22 @@ class SentenceParser():
                 normalizedName = token.lemma_,
                 dependType = "-",
                 caseType = token.dep_,
-                namedEntity = nerExp,
-                rangeExpressions = rangeExp,
-                categories = {},
-                domains = {},
                 isDenialWord = isDenial,
                 isConditionalConnection = isConditionalConnection,
                 surfaceYomi = "",
                 normalizedNameYomi = "",
                 modalityType =  "-",
-                logicType = "-",
+                parallelType = "-",
                 nodeType = nodeType,
-                lang = knowledgeForParser.knowledge.lang,
-                extentText ="{}"
+                morphemes = [token.pos_]
+            )
+
+            node = KnowledgeBaseNode(
+                nodeId = sentenceId + "-" + str(token.i),
+                propositionId = propositionId,
+                sentenceId = sentenceId,
+                predicateArgumentStructure = predicateArgumentStructure,
+                localContext = localContext,
             )
             nodeMap[sentenceId + "-" + str(token.i)] = node
             
@@ -116,12 +127,22 @@ class SentenceParser():
                     destinationId = sentenceId + "-" + str(token.head.i),
                     caseStr = token.dep_,
                     dependType = "-",
-                    logicType = "-",
-                    lang = knowledgeForParser.knowledge.lang
+                    parallelType = "-",
+                    hasInclusion = isConditionalConnection,
+                    logicType = "-"                    
                 ))
-            
-        defaultDeductionResult = DeductionResult(status=False,matchedPropositionIds=[], deductionUnit="")
-        aso = AnalyzedSentenceObject(nodeMap=nodeMap, edgeList=edgeList, sentenceType=sentenceType, sentenceId=knowledgeForParser.sentenceId, lang=knowledgeForParser.knowledge.lang, deductionResultMap={"0":defaultDeductionResult, "1":defaultDeductionResult})
+        localContextForFeature = LocalContextForFeature(lang=knowledgeForParser.knowledge.lang, knowledgeFeatureReferences=[])
+        knowledgeBaseSemiGlobalNode = KnowledgeBaseSemiGlobalNode(
+            nodeId = sentenceId, 
+            propositionId = propositionId,
+            sentenceId = sentenceId,
+            sentence = knowledgeForParser.knowledge.sentence,
+            sentenceType = sentenceType,
+            localContextForFeature = localContextForFeature,            
+        )
+
+        defaultDeductionResult = DeductionResult(status=False, coveredPropositionResults = [])
+        aso = AnalyzedSentenceObject(nodeMap=nodeMap, edgeList=edgeList, knowledgeBaseSemiGlobalNode=knowledgeBaseSemiGlobalNode, deductionResult=defaultDeductionResult)
         return aso
 
     #Get named entity and quantity range representation from words starting with a character index.

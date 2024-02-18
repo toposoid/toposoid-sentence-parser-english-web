@@ -16,7 +16,7 @@
 
 from fastapi.testclient import TestClient
 from api import app
-from model import AnalyzedSentenceObject, AnalyzedSentenceObjects
+from model import AnalyzedSentenceObject, AnalyzedSentenceObjects, SurfaceInfo
 import pytest
 from functools import reduce
 
@@ -38,7 +38,7 @@ def test_PremiseAndClaimEmpty():
 def test_PremiseOneSentenceAndClaimEmpty():
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json"},
-                        json={"premise": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "The answer is blown'in the wind.", "lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False}}], "claim": []})    
+                        json={"premise": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "The answer is blown'in the wind.", "lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}], "claim": []})    
     assert response.status_code == 400
     assert "It is not possible to register only as a prerequisite. If you have any premises, please also register a claim." in str(response.json())
 
@@ -46,32 +46,32 @@ def test_PremiseOneSentenceAndClaimEmpty():
 def test_PremiseEnmptyAndClaimOneSentence():
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json"},
-                        json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "The answer is blown'in the wind.","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False}}]})    
+                        json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "The answer is blown'in the wind.","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}]})    
     assert response.status_code == 200
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     assert len(asos.analyzedSentenceObjects) == 1
     aso = asos.analyzedSentenceObjects[0]
-    assert aso.sentenceType == 1
-    scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.currentId) 
-    sentence =  reduce(lambda a, b: a + " " + b.surface, scoresSorted, "")
+    assert aso.knowledgeBaseSemiGlobalNode.sentenceType == 1
+    scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.predicateArgumentStructure.currentId) 
+    sentence =  reduce(lambda a, b: a + " " + b.predicateArgumentStructure.surface, scoresSorted, "")
     assert sentence.replace(" .", ".").strip() == "The answer is blown'in the wind."
 
 
 def test_NegativeSimpleSentence():
     response = client.post("/analyze",
                             headers={"Content-Type": "application/json"},
-                            json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge": {"sentence": "The problem does not seem soluble.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False}}]})    
+                            json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge": {"sentence": "The problem does not seem soluble.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}]})    
     assert response.status_code == 200
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     for aso in asos.analyzedSentenceObjects:
-        scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.currentId)
+        scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.predicateArgumentStructure.currentId)
         surfaces = []
         caseTypes = []
         denialIndex = -1
         for i, x in enumerate(scoresSorted):
-            surfaces.append(x.surface)
-            caseTypes.append(x.caseType)
-            if x.isDenialWord: denialIndex  = i
+            surfaces.append(x.predicateArgumentStructure.surface)
+            caseTypes.append(x.predicateArgumentStructure.caseType)
+            if x.predicateArgumentStructure.isDenialWord: denialIndex  = i
         sentence = " ".join(surfaces).replace(" .", ".")
         assert sentence == "The problem does not seem soluble."
         assert caseTypes == ['det', 'nsubj', 'aux', 'neg', 'ROOT', 'oprd', 'punct']
@@ -81,16 +81,16 @@ def test_NegativeSimpleSentence():
 def test_PremiseOneSentencetyAndClaimOneSentence():
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json"},
-                        json={"premise": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "You may say I'm a dreamer, But I'm not the only one.","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False}}], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "I hope someday you'll join us And the world will live as one.","lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False}}]})    
+                        json={"premise": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "You may say I'm a dreamer, But I'm not the only one.","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "I hope someday you'll join us And the world will live as one.","lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}]})    
     assert response.status_code == 200
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     assert len(asos.analyzedSentenceObjects) == 2
     for aso in asos.analyzedSentenceObjects:
-        scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.currentId) 
-        sentence =  reduce(lambda a, b: a + " " + b.surface, scoresSorted, "").replace(" .", ".").replace(" ,", ",").replace(" '", "'").strip()
-        if aso.sentenceType == 0:
+        scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.predicateArgumentStructure.currentId) 
+        sentence =  reduce(lambda a, b: a + " " + b.predicateArgumentStructure.surface, scoresSorted, "").replace(" .", ".").replace(" ,", ",").replace(" '", "'").strip()
+        if aso.knowledgeBaseSemiGlobalNode.sentenceType == 0:
             assert sentence == "You may say I'm a dreamer, But I'm not the only one."
-        elif aso.sentenceType == 1:
+        elif aso.knowledgeBaseSemiGlobalNode.sentenceType == 1:
             assert sentence == "I hope someday you'll join us And the world will live as one."
         else:
             pytest.fail("Unexpected Error ..")
@@ -98,16 +98,16 @@ def test_PremiseOneSentencetyAndClaimOneSentence():
 def test_PremiseMultipleSentencetyAndClaimMultipleSentence():
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json"},
-                        json={"premise": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "Just The Way You Are!","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False}}, {"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "The answer is blown'in the wind.","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False}}], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "You may say I'm a dreamer, But I'm not the only one.","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False}}, {"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "I hope someday you'll join us And the world will live as one.","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False}}]})    
+                        json={"premise": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "Just The Way You Are!","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}, {"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "The answer is blown'in the wind.","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "You may say I'm a dreamer, But I'm not the only one.","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}, {"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "I hope someday you'll join us And the world will live as one.","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}]})    
     assert response.status_code == 200
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     assert len(asos.analyzedSentenceObjects) == 4
     for aso in asos.analyzedSentenceObjects:
-        scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.currentId) 
-        sentence =  reduce(lambda a, b: a + " " + b.surface, scoresSorted, "").replace(" .", ".").replace(" ,", ",").replace(" '", "'").strip()
-        if aso.sentenceType == 0:
+        scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.predicateArgumentStructure.currentId) 
+        sentence =  reduce(lambda a, b: a + " " + b.predicateArgumentStructure.surface, scoresSorted, "").replace(" .", ".").replace(" ,", ",").replace(" '", "'").strip()
+        if aso.knowledgeBaseSemiGlobalNode.sentenceType == 0:
             assert sentence == "Just The Way You Are !" or sentence == "The answer is blown'in the wind."
-        elif aso.sentenceType == 1:
+        elif aso.knowledgeBaseSemiGlobalNode.sentenceType == 1:
             assert sentence == "You may say I'm a dreamer, But I'm not the only one." or sentence == "I hope someday you'll join us And the world will live as one."
         else:
             pytest.fail("Unexpected Error ..")
@@ -116,11 +116,11 @@ def test_PremiseMultipleSentencetyAndClaimMultipleSentence():
 def test_SimpleSentenceWithQuantitativeExpressions0():
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json"},
-                        json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge": {"sentence": "His weight is 70kg.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False}}]})    
+                        json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge": {"sentence": "His weight is 70kg.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}]})    
     assert response.status_code == 200
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     for aso in asos.analyzedSentenceObjects:
-        scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.currentId)
+        scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.predicateArgumentStructure.currentId)
         surfaces = []
         caseTypes = []
         quantity = ""
@@ -128,13 +128,13 @@ def test_SimpleSentenceWithQuantitativeExpressions0():
         range  = ""  
         prefix = ""  
         for x in scoresSorted:
-            surfaces.append(x.surface)
-            caseTypes.append(x.caseType)
-            if "70" in x.rangeExpressions:
-                quantity = x.rangeExpressions["70"]["quantity"]
-                unit = x.rangeExpressions["70"]["unit"]
-                range = x.rangeExpressions["70"]["range"]
-                prefix = x.rangeExpressions["70"]["prefix"]
+            surfaces.append(x.predicateArgumentStructure.surface)
+            caseTypes.append(x.predicateArgumentStructure.caseType)
+            if "70" in x.localContext.rangeExpressions:
+                quantity = x.localContext.rangeExpressions["70"]["quantity"]
+                unit = x.localContext.rangeExpressions["70"]["unit"]
+                range = x.localContext.rangeExpressions["70"]["range"]
+                prefix = x.localContext.rangeExpressions["70"]["prefix"]
         sentence = " ".join(surfaces).replace(" .", ".")
         assert sentence == "His weight is 70 kg."
         assert quantity == "70.0"
@@ -145,11 +145,11 @@ def test_SimpleSentenceWithQuantitativeExpressions0():
 def test_SimpleSentenceWithQuantitativeExpressions1():
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json"},
-                        json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "His weight is over 70kg.","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False}}]})                           
+                        json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "His weight is over 70kg.","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}]})                           
     assert response.status_code == 200
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     for aso in asos.analyzedSentenceObjects:
-        scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.currentId)
+        scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.predicateArgumentStructure.currentId)
         surfaces = []
         caseTypes = []
         quantity = ""
@@ -157,13 +157,13 @@ def test_SimpleSentenceWithQuantitativeExpressions1():
         range  = ""    
         prefix = ""
         for x in scoresSorted:
-            surfaces.append(x.surface)
-            caseTypes.append(x.caseType)
-            if "70" in x.rangeExpressions:
-                quantity = x.rangeExpressions["70"]["quantity"]
-                unit = x.rangeExpressions["70"]["unit"]
-                range = x.rangeExpressions["70"]["range"]
-                prefix = x.rangeExpressions["70"]["prefix"]
+            surfaces.append(x.predicateArgumentStructure.surface)
+            caseTypes.append(x.predicateArgumentStructure.caseType)
+            if "70" in x.localContext.rangeExpressions:
+                quantity = x.localContext.rangeExpressions["70"]["quantity"]
+                unit = x.localContext.rangeExpressions["70"]["unit"]
+                range = x.localContext.rangeExpressions["70"]["range"]
+                prefix = x.localContext.rangeExpressions["70"]["prefix"]
                 
         sentence = " ".join(surfaces).replace(" .", ".")
         assert sentence == "His weight is over 70 kg."
@@ -175,11 +175,11 @@ def test_SimpleSentenceWithQuantitativeExpressions1():
 def test_SimpleSentenceWithQuantitativeExpressions2():
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json"},
-                        json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "Its stock price has risen by more than $ 10.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False}}]})    
+                        json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "Its stock price has risen by more than $ 10.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}]})    
     assert response.status_code == 200
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     for aso in asos.analyzedSentenceObjects:
-        scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.currentId)
+        scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.predicateArgumentStructure.currentId)
         surfaces = []
         caseTypes = []
         quantity = ""
@@ -187,13 +187,13 @@ def test_SimpleSentenceWithQuantitativeExpressions2():
         range  = ""    
         prefix = ""
         for x in scoresSorted:
-            surfaces.append(x.surface)
-            caseTypes.append(x.caseType)
-            if "$ 10" in x.rangeExpressions:
-                quantity = x.rangeExpressions["$ 10"]["quantity"]
-                unit = x.rangeExpressions["$ 10"]["unit"]
-                range = x.rangeExpressions["$ 10"]["range"]
-                prefix = x.rangeExpressions["$ 10"]["prefix"]
+            surfaces.append(x.predicateArgumentStructure.surface)
+            caseTypes.append(x.predicateArgumentStructure.caseType)
+            if "$ 10" in x.localContext.rangeExpressions:
+                quantity = x.localContext.rangeExpressions["$ 10"]["quantity"]
+                unit = x.localContext.rangeExpressions["$ 10"]["unit"]
+                range = x.localContext.rangeExpressions["$ 10"]["range"]
+                prefix = x.localContext.rangeExpressions["$ 10"]["prefix"]
                 
         sentence = " ".join(surfaces).replace(" .", ".")
         assert sentence == "Its stock price has risen by more than $ 10."
@@ -205,11 +205,11 @@ def test_SimpleSentenceWithQuantitativeExpressions2():
 def test_SimpleSentenceWithQuantitativeExpressions3():
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json"},
-                        json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "The height limit is 170cm.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False}}]})    
+                        json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "The height limit is 170cm.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}]})    
     assert response.status_code == 200
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     for aso in asos.analyzedSentenceObjects:
-        scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.currentId)
+        scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.predicateArgumentStructure.currentId)
         surfaces = []
         caseTypes = []
         quantity = ""
@@ -217,13 +217,13 @@ def test_SimpleSentenceWithQuantitativeExpressions3():
         range  = ""    
         prefix = ""
         for x in scoresSorted:
-            surfaces.append(x.surface)
-            caseTypes.append(x.caseType)
-            if "170" in x.rangeExpressions:
-                quantity = x.rangeExpressions["170"]["quantity"]
-                unit = x.rangeExpressions["170"]["unit"]
-                range = x.rangeExpressions["170"]["range"]
-                prefix = x.rangeExpressions["170"]["prefix"]
+            surfaces.append(x.predicateArgumentStructure.surface)
+            caseTypes.append(x.predicateArgumentStructure.caseType)
+            if "170" in x.localContext.rangeExpressions:
+                quantity = x.localContext.rangeExpressions["170"]["quantity"]
+                unit = x.localContext.rangeExpressions["170"]["unit"]
+                range = x.localContext.rangeExpressions["170"]["range"]
+                prefix = x.localContext.rangeExpressions["170"]["prefix"]
                 
         sentence = " ".join(surfaces).replace(" .", ".")
         assert sentence == "The height limit is 170 cm."
@@ -235,25 +235,25 @@ def test_SimpleSentenceWithQuantitativeExpressions3():
 def test_SimpleSentenceWithQuantitativeExpressions4():
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json"},
-                        json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "The deadline was April 1, 2022.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False}}]})    
+                        json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "The deadline was April 1, 2022.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}]})    
     #The deadline was April 1, 2022.
     #The deadline is from April 2022 to April 2023.
     assert response.status_code == 200
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     for aso in asos.analyzedSentenceObjects:
-        scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.currentId)
+        scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.predicateArgumentStructure.currentId)
         surfaces = []
         caseTypes = []
         quantity = ""
         unit = ""
         range  = ""        
         for x in scoresSorted:
-            surfaces.append(x.surface)
-            caseTypes.append(x.caseType)
-            if "April 1, 2022" in x.rangeExpressions:
-                quantity = x.rangeExpressions["April 1, 2022"]["quantity"]
-                unit = x.rangeExpressions["April 1, 2022"]["unit"]
-                range = x.rangeExpressions["April 1, 2022"]["range"]
+            surfaces.append(x.predicateArgumentStructure.surface)
+            caseTypes.append(x.predicateArgumentStructure.caseType)
+            if "April 1, 2022" in x.localContext.rangeExpressions:
+                quantity = x.localContext.rangeExpressions["April 1, 2022"]["quantity"]
+                unit = x.localContext.rangeExpressions["April 1, 2022"]["unit"]
+                range = x.localContext.rangeExpressions["April 1, 2022"]["range"]
                 
         sentence = " ".join(surfaces).replace(" .", ".")
         assert sentence == "The deadline was April 1 , 2022."
@@ -265,11 +265,11 @@ def test_SimpleSentenceWithQuantitativeExpressions4():
 def test_SimpleSentenceWithQuantitativeExpressions5():
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json"},
-                        json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "The deadline was 23:59:59.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False}}]})    
+                        json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "The deadline was 23:59:59.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}]})    
     assert response.status_code == 200
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     for aso in asos.analyzedSentenceObjects:
-        scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.currentId)
+        scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.predicateArgumentStructure.currentId)
         surfaces = []
         caseTypes = []
         quantity = ""
@@ -277,12 +277,12 @@ def test_SimpleSentenceWithQuantitativeExpressions5():
         range  = ""    
         
         for x in scoresSorted:
-            surfaces.append(x.surface)
-            caseTypes.append(x.caseType)
-            if "23:59:59" in x.rangeExpressions:
-                quantity = x.rangeExpressions["23:59:59"]["quantity"]
-                unit = x.rangeExpressions["23:59:59"]["unit"]
-                range = x.rangeExpressions["23:59:59"]["range"]
+            surfaces.append(x.predicateArgumentStructure.surface)
+            caseTypes.append(x.predicateArgumentStructure.caseType)
+            if "23:59:59" in x.localContext.rangeExpressions:
+                quantity = x.localContext.rangeExpressions["23:59:59"]["quantity"]
+                unit = x.localContext.rangeExpressions["23:59:59"]["unit"]
+                range = x.localContext.rangeExpressions["23:59:59"]["range"]
                 
         sentence = " ".join(surfaces).replace(" .", ".")
         assert sentence == "The deadline was 23:59:59."
@@ -296,12 +296,26 @@ def test_IrregularSimpleSentence():
     try:
         response = client.post("/analyze",
                             headers={"Content-Type": "application/json"},
-                            json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge": {"sentence": "!#$%&Y'\"UIO\n strange =*+<H`OJWKFHgb", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False}}]})    
+                            json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge": {"sentence": "!#$%&Y'\"UIO\n strange =*+<H`OJWKFHgb", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}]})    
         assert response.status_code == 200
         asos = AnalyzedSentenceObjects.parse_obj(response.json())
     
     except Exception:
         pytest.fail("Unexpected Error ..")
+
+
+def test_Sprit():
+    try:
+        response = client.post("/split",
+                            headers={"Content-Type": "application/json"},
+                            json={"sentence": "The GrandCanyon was registered as a national park in 1919."})
+        assert response.status_code == 200
+        print(response.json())
+        correctJson = [{'surface': 'GrandCanyon', 'index': 1}, {'surface': 'park', 'index': 7}]        
+        assert(response.json()==correctJson)
+    except Exception:
+        pytest.fail("Unexpected Error ..")
+
 
 '''
 def test_SimpleSentenceWithConditionalClauses():
