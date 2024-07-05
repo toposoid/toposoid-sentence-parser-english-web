@@ -14,17 +14,21 @@
   limitations under the License.
  '''
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Header
 from model import InputSentenceForParser, KnowledgeForParser, AnalyzedSentenceObjects, Knowledge, SingleSentence, SurfaceInfo
 from SentenceParser import SentenceParser
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from starlette.middleware.cors import CORSMiddleware
 from logging import config
+from typing import Optional
+from utils import formatMessageForLogger
+
 config.fileConfig('logging.conf')
 import logging
 LOG = logging.getLogger(__name__)
 import traceback
+extra_args = {"tab":"\t"}
 
 
 app = FastAPI(
@@ -43,22 +47,26 @@ app.add_middleware(
 
 #This API is for inference
 @app.post("/analyze")
-def analyze(inputSentenceForParser:InputSentenceForParser):
-    try:
+def analyze(inputSentenceForParser:InputSentenceForParser, X_TOPOSOID_USERNAME: Optional[str] = Header(None, convert_underscores=False)):
+    try:                
         asos = []
-        if len(inputSentenceForParser.premise) > 0 and len(inputSentenceForParser.claim) == 0: return JSONResponse({"status": "ERROR", "message": "It is not possible to register only as a prerequisite. If you have any premises, please also register a claim."}, status_code = 400)
+        if len(inputSentenceForParser.premise) > 0 and len(inputSentenceForParser.claim) == 0: return JSONResponse({"status": "ERROR", "message": "It is not possible to register only as a prerequisite. If you have any premises, please also register a claim."}, status_code = 400)        
+        LOG.info(formatMessageForLogger("PREMISE:" + ",".join(list(map(lambda x: x.knowledge.sentence, inputSentenceForParser.premise))), X_TOPOSOID_USERNAME),extra={"tab":"\t"})
+        LOG.info(formatMessageForLogger("CLAIM:" + ",".join(list(map(lambda x: x.knowledge.sentence, inputSentenceForParser.claim))), X_TOPOSOID_USERNAME),extra={"tab":"\t"})        
+
         for knowledgeForParser in inputSentenceForParser.premise:
             asos.append(parser.parse(knowledgeForParser, "0"))
         for knowledgeForParser in inputSentenceForParser.claim:
             asos.append(parser.parse(knowledgeForParser, "1"))
         return JSONResponse(content=jsonable_encoder(AnalyzedSentenceObjects(analyzedSentenceObjects = asos)))
     except Exception as e:
-        LOG.error(traceback.format_exc())
+        LOG.error(formatMessageForLogger(traceback.format_exc(), X_TOPOSOID_USERNAME),extra={"tab":"\t"})
         return JSONResponse({"status": "ERROR", "message": traceback.format_exc()})
 
 @app.post("/split")
-def split(singleSentence:SingleSentence):
+def split(singleSentence:SingleSentence, X_TOPOSOID_USERNAME: Optional[str] = Header(None, convert_underscores=False)):
     try:        
+        LOG.info(formatMessageForLogger("SENTENCE:" + singleSentence.sentence, X_TOPOSOID_USERNAME), extra={"tab":"\t"})
         if len(singleSentence.sentence) == 0 : return JSONResponse({"status": "ERROR", "message": "It is not possible to register only as a prerequisite. If you have any sentence."}, status_code = 400)
         knowledge = Knowledge(sentence=singleSentence.sentence, lang="", extentInfoJson="{}", isNegativeSentence=False)
         knowledgeForParser = KnowledgeForParser(propositionId = "", sentenceId="", knowledge=knowledge)        
@@ -68,5 +76,5 @@ def split(singleSentence:SingleSentence):
         surfaceInfoList = list(map(lambda x: SurfaceInfo(surface=x.surface,index= x.currentId), candidates))
         return JSONResponse(content=jsonable_encoder(surfaceInfoList))
     except Exception as e:
-        LOG.error(traceback.format_exc())
+        LOG.error(formatMessageForLogger(traceback.format_exc(), X_TOPOSOID_USERNAME), extra={"tab":"\t"})
         return JSONResponse({"status": "ERROR", "message": traceback.format_exc()})
