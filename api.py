@@ -15,7 +15,7 @@
  '''
 
 from fastapi import FastAPI, Header
-from model import InputSentenceForParser, KnowledgeForParser, AnalyzedSentenceObjects, Knowledge, SingleSentence, SurfaceInfo
+from model import InputSentenceForParser, KnowledgeForParser, AnalyzedSentenceObjects, Knowledge, SingleSentence, SurfaceInfo, TransversalState
 from SentenceParser import SentenceParser
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
@@ -47,26 +47,30 @@ app.add_middleware(
 
 #This API is for inference
 @app.post("/analyze")
-def analyze(inputSentenceForParser:InputSentenceForParser, X_TOPOSOID_USERNAME: Optional[str] = Header(None, convert_underscores=False)):
+def analyze(inputSentenceForParser:InputSentenceForParser, X_TOPOSOID_TRANSVERSAL_STATE: Optional[str] = Header(None, convert_underscores=False)):
     try:                
         asos = []
+        transversalState = TransversalState.parse_raw(X_TOPOSOID_TRANSVERSAL_STATE.replace("'", "\""))
         if len(inputSentenceForParser.premise) > 0 and len(inputSentenceForParser.claim) == 0: return JSONResponse({"status": "ERROR", "message": "It is not possible to register only as a prerequisite. If you have any premises, please also register a claim."}, status_code = 400)        
-        LOG.info(formatMessageForLogger("PREMISE:" + ",".join(list(map(lambda x: x.knowledge.sentence, inputSentenceForParser.premise))), X_TOPOSOID_USERNAME),extra={"tab":"\t"})
-        LOG.info(formatMessageForLogger("CLAIM:" + ",".join(list(map(lambda x: x.knowledge.sentence, inputSentenceForParser.claim))), X_TOPOSOID_USERNAME),extra={"tab":"\t"})        
+        LOG.info(formatMessageForLogger("PREMISE:" + ",".join(list(map(lambda x: x.knowledge.sentence, inputSentenceForParser.premise))), transversalState.username),extra={"tab":"\t"})
+        LOG.info(formatMessageForLogger("CLAIM:" + ",".join(list(map(lambda x: x.knowledge.sentence, inputSentenceForParser.claim))), transversalState.username),extra={"tab":"\t"})        
 
         for knowledgeForParser in inputSentenceForParser.premise:
             asos.append(parser.parse(knowledgeForParser, "0"))
         for knowledgeForParser in inputSentenceForParser.claim:
             asos.append(parser.parse(knowledgeForParser, "1"))
-        return JSONResponse(content=jsonable_encoder(AnalyzedSentenceObjects(analyzedSentenceObjects = asos)))
+        response = JSONResponse(content=jsonable_encoder(AnalyzedSentenceObjects(analyzedSentenceObjects = asos)))
+        LOG.info(formatMessageForLogger("Parsing completed.", transversalState.username),extra={"tab":"\t"})        
+        return response
     except Exception as e:
-        LOG.error(formatMessageForLogger(traceback.format_exc(), X_TOPOSOID_USERNAME),extra={"tab":"\t"})
+        LOG.error(formatMessageForLogger(traceback.format_exc(), transversalState.username),extra={"tab":"\t"})
         return JSONResponse({"status": "ERROR", "message": traceback.format_exc()})
 
 @app.post("/split")
-def split(singleSentence:SingleSentence, X_TOPOSOID_USERNAME: Optional[str] = Header(None, convert_underscores=False)):
-    try:        
-        LOG.info(formatMessageForLogger("SENTENCE:" + singleSentence.sentence, X_TOPOSOID_USERNAME), extra={"tab":"\t"})
+def split(singleSentence:SingleSentence, X_TOPOSOID_TRANSVERSAL_STATE: Optional[str] = Header(None, convert_underscores=False)):
+    try:    
+        transversalState = TransversalState.parse_raw(X_TOPOSOID_TRANSVERSAL_STATE.replace("'", "\""))    
+        LOG.info(formatMessageForLogger("SENTENCE:" + singleSentence.sentence, transversalState.username), extra={"tab":"\t"})
         if len(singleSentence.sentence) == 0 : return JSONResponse({"status": "ERROR", "message": "It is not possible to register only as a prerequisite. If you have any sentence."}, status_code = 400)
         knowledge = Knowledge(sentence=singleSentence.sentence, lang="", extentInfoJson="{}", isNegativeSentence=False)
         knowledgeForParser = KnowledgeForParser(propositionId = "", sentenceId="", knowledge=knowledge)        
@@ -74,7 +78,9 @@ def split(singleSentence:SingleSentence, X_TOPOSOID_USERNAME: Optional[str] = He
         predicateArgumentStructures = list(map(lambda x: x.predicateArgumentStructure, asos.nodeMap.values()))        
         candidates = list(filter(lambda x: "NOUN" in x.morphemes or "PROPN" in x.morphemes, predicateArgumentStructures))
         surfaceInfoList = list(map(lambda x: SurfaceInfo(surface=x.surface,index= x.currentId), candidates))
-        return JSONResponse(content=jsonable_encoder(surfaceInfoList))
+        response = JSONResponse(content=jsonable_encoder(surfaceInfoList))
+        LOG.info(formatMessageForLogger("Splitting completed.", transversalState.username),extra={"tab":"\t"})
+        return response
     except Exception as e:
-        LOG.error(formatMessageForLogger(traceback.format_exc(), X_TOPOSOID_USERNAME), extra={"tab":"\t"})
+        LOG.error(formatMessageForLogger(traceback.format_exc(), transversalState.username), extra={"tab":"\t"})
         return JSONResponse({"status": "ERROR", "message": traceback.format_exc()})

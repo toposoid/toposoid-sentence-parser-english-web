@@ -257,3 +257,6 @@ com.ideal.linked.toposoid.knowledgebase.nlp.model
 class SurfaceInfo(BaseModel):
    surface: str
    index: int 
+
+class TransversalState(BaseModel):
+    username:str
