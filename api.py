@@ -48,9 +48,9 @@ app.add_middleware(
 #This API is for inference
 @app.post("/analyze")
 def analyze(inputSentenceForParser:InputSentenceForParser, X_TOPOSOID_TRANSVERSAL_STATE: Optional[str] = Header(None, convert_underscores=False)):
+    transversalState = TransversalState.parse_raw(X_TOPOSOID_TRANSVERSAL_STATE.replace("'", "\""))
     try:                
-        asos = []
-        transversalState = TransversalState.parse_raw(X_TOPOSOID_TRANSVERSAL_STATE.replace("'", "\""))
+        asos = []        
         if len(inputSentenceForParser.premise) > 0 and len(inputSentenceForParser.claim) == 0: return JSONResponse({"status": "ERROR", "message": "It is not possible to register only as a prerequisite. If you have any premises, please also register a claim."}, status_code = 400)        
         LOG.info(formatMessageForLogger("PREMISE:" + ",".join(list(map(lambda x: x.knowledge.sentence, inputSentenceForParser.premise))), transversalState.username),extra={"tab":"\t"})
         LOG.info(formatMessageForLogger("CLAIM:" + ",".join(list(map(lambda x: x.knowledge.sentence, inputSentenceForParser.claim))), transversalState.username),extra={"tab":"\t"})        
@@ -68,8 +68,8 @@ def analyze(inputSentenceForParser:InputSentenceForParser, X_TOPOSOID_TRANSVERSA
 
 @app.post("/split")
 def split(singleSentence:SingleSentence, X_TOPOSOID_TRANSVERSAL_STATE: Optional[str] = Header(None, convert_underscores=False)):
-    try:    
-        transversalState = TransversalState.parse_raw(X_TOPOSOID_TRANSVERSAL_STATE.replace("'", "\""))    
+    transversalState = TransversalState.parse_raw(X_TOPOSOID_TRANSVERSAL_STATE.replace("'", "\""))    
+    try:            
         LOG.info(formatMessageForLogger("SENTENCE:" + singleSentence.sentence, transversalState.username), extra={"tab":"\t"})
         if len(singleSentence.sentence) == 0 : return JSONResponse({"status": "ERROR", "message": "It is not possible to register only as a prerequisite. If you have any sentence."}, status_code = 400)
         knowledge = Knowledge(sentence=singleSentence.sentence, lang="", extentInfoJson="{}", isNegativeSentence=False)
