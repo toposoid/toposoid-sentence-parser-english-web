@@ -23,17 +23,17 @@ from starlette.middleware.cors import CORSMiddleware
 from logging import config
 from typing import Optional
 from utils import formatMessageForLogger
+import yaml
 
-config.fileConfig('logging.conf')
+config.dictConfig(yaml.load(open("logging.yml", encoding="utf-8").read(), Loader=yaml.SafeLoader))
 import logging
 LOG = logging.getLogger(__name__)
 import traceback
-extra_args = {"tab":"\t"}
 
 
 app = FastAPI(
     title="toposoid-sentence-parser-english-web",
-    version="0.5-SNAPSHOT"
+    version="0.6-SNAPSHOT"
 )
 parser = SentenceParser()
 
@@ -52,18 +52,18 @@ def analyze(inputSentenceForParser:InputSentenceForParser, X_TOPOSOID_TRANSVERSA
     try:                
         asos = []        
         if len(inputSentenceForParser.premise) > 0 and len(inputSentenceForParser.claim) == 0: return JSONResponse({"status": "ERROR", "message": "It is not possible to register only as a prerequisite. If you have any premises, please also register a claim."}, status_code = 400)        
-        LOG.info(formatMessageForLogger("PREMISE:" + ",".join(list(map(lambda x: x.knowledge.sentence, inputSentenceForParser.premise))), transversalState.username),extra={"tab":"\t"})
-        LOG.info(formatMessageForLogger("CLAIM:" + ",".join(list(map(lambda x: x.knowledge.sentence, inputSentenceForParser.claim))), transversalState.username),extra={"tab":"\t"})        
+        LOG.info(formatMessageForLogger("PREMISE:" + ",".join(list(map(lambda x: x.knowledge.sentence, inputSentenceForParser.premise))), transversalState.username))
+        LOG.info(formatMessageForLogger("CLAIM:" + ",".join(list(map(lambda x: x.knowledge.sentence, inputSentenceForParser.claim))), transversalState.username))        
 
         for knowledgeForParser in inputSentenceForParser.premise:
             asos.append(parser.parse(knowledgeForParser, "0"))
         for knowledgeForParser in inputSentenceForParser.claim:
             asos.append(parser.parse(knowledgeForParser, "1"))
         response = JSONResponse(content=jsonable_encoder(AnalyzedSentenceObjects(analyzedSentenceObjects = asos)))
-        LOG.info(formatMessageForLogger("Parsing completed.", transversalState.username),extra={"tab":"\t"})        
+        LOG.info(formatMessageForLogger("Parsing completed.", transversalState.username))        
         return response
     except Exception as e:
-        LOG.error(formatMessageForLogger(traceback.format_exc(), transversalState.username),extra={"tab":"\t"})
+        LOG.error(formatMessageForLogger(traceback.format_exc(), transversalState.username))
         return JSONResponse({"status": "ERROR", "message": traceback.format_exc()})
 
 @app.post("/split")
@@ -79,7 +79,7 @@ def split(singleSentence:SingleSentence, X_TOPOSOID_TRANSVERSAL_STATE: Optional[
         candidates = list(filter(lambda x: "NOUN" in x.morphemes or "PROPN" in x.morphemes, predicateArgumentStructures))
         surfaceInfoList = list(map(lambda x: SurfaceInfo(surface=x.surface,index= x.currentId), candidates))
         response = JSONResponse(content=jsonable_encoder(surfaceInfoList))
-        LOG.info(formatMessageForLogger("Splitting completed.", transversalState.username),extra={"tab":"\t"})
+        LOG.info(formatMessageForLogger("Splitting completed.", transversalState.username))
         return response
     except Exception as e:
         LOG.error(formatMessageForLogger(traceback.format_exc(), transversalState.username), extra={"tab":"\t"})
