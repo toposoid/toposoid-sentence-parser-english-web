@@ -70,7 +70,7 @@ def analyze(inputSentenceForParser:InputSentenceForParser, X_TOPOSOID_TRANSVERSA
 def split(singleSentence:SingleSentence, X_TOPOSOID_TRANSVERSAL_STATE: Optional[str] = Header(None, convert_underscores=False)):
     transversalState = TransversalState.parse_raw(X_TOPOSOID_TRANSVERSAL_STATE.replace("'", "\""))    
     try:            
-        LOG.info(formatMessageForLogger("SENTENCE:" + singleSentence.sentence, transversalState.username), extra={"tab":"\t"})
+        LOG.info(formatMessageForLogger("SENTENCE:" + singleSentence.sentence, transversalState.username))
         if len(singleSentence.sentence) == 0 : return JSONResponse({"status": "ERROR", "message": "It is not possible to register only as a prerequisite. If you have any sentence."}, status_code = 400)
         knowledge = Knowledge(sentence=singleSentence.sentence, lang="", extentInfoJson="{}", isNegativeSentence=False)
         knowledgeForParser = KnowledgeForParser(propositionId = "", sentenceId="", knowledge=knowledge)        
@@ -82,5 +82,5 @@ def split(singleSentence:SingleSentence, X_TOPOSOID_TRANSVERSAL_STATE: Optional[
         LOG.info(formatMessageForLogger("Splitting completed.", transversalState.username))
         return response
     except Exception as e:
-        LOG.error(formatMessageForLogger(traceback.format_exc(), transversalState.username), extra={"tab":"\t"})
+        LOG.error(formatMessageForLogger(traceback.format_exc(), transversalState.username))
         return JSONResponse({"status": "ERROR", "message": traceback.format_exc()})
