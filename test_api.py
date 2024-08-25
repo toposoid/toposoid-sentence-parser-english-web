@@ -23,7 +23,7 @@ from fastapi.encoders import jsonable_encoder
 
 #This is a unit test module
 client = TestClient(app)
-transversalState = str(jsonable_encoder(TransversalState(username="guest")))
+transversalState = str(jsonable_encoder(TransversalState(userId="test-user", username="guest", roleId=0, csrfToken = "")))
 
 def test_PremiseAndClaimEmpty():
     try:
