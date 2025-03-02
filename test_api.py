@@ -16,20 +16,22 @@
 
 from fastapi.testclient import TestClient
 from api import app
-from model import AnalyzedSentenceObject, AnalyzedSentenceObjects, SurfaceInfo, TransversalState
+#from _model import AnalyzedSentenceObject, AnalyzedSentenceObjects, SurfaceInfo, TransversalState
+from ToposoidCommon.model import AnalyzedSentenceObjects, TransversalState, InputSentenceForParser, KnowledgeForParser, Knowledge
 import pytest
 from functools import reduce
 from fastapi.encoders import jsonable_encoder
-
+import uuid
 #This is a unit test module
 client = TestClient(app)
 transversalState = str(jsonable_encoder(TransversalState(userId="test-user", username="guest", roleId=0, csrfToken = "")))
 
 def test_PremiseAndClaimEmpty():
     try:
+        input = InputSentenceForParser(premise=[], claim=[])
         response = client.post("/analyze",
                             headers={"Content-Type": "application/json", "X_TOPOSOID_TRANSVERSAL_STATE": transversalState},
-                            json={"premise": [], "claim": []})    
+                            json=jsonable_encoder(input))    
         assert response.status_code == 200
         asos = AnalyzedSentenceObjects.parse_obj(response.json())        
         assert len(asos.analyzedSentenceObjects) == 0
@@ -38,17 +40,23 @@ def test_PremiseAndClaimEmpty():
 
 
 def test_PremiseOneSentenceAndClaimEmpty():
+    knowledge1 = Knowledge(sentence = "The answer is blown'in the wind.", lang = "en_US", extentInfoJson = "{}")
+    premise = KnowledgeForParser(propositionId=str(uuid.uuid1()), sentenceId=str(uuid.uuid1()), knowledge = knowledge1)
+    input = InputSentenceForParser(premise=[premise], claim=[])
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json", "X_TOPOSOID_TRANSVERSAL_STATE": transversalState},
-                        json={"premise": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "The answer is blown'in the wind.", "lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}], "claim": []})    
+                        json=jsonable_encoder(input))
     assert response.status_code == 400
     assert "It is not possible to register only as a prerequisite. If you have any premises, please also register a claim." in str(response.json())
 
 
 def test_PremiseEnmptyAndClaimOneSentence():
+    knowledge1 = Knowledge(sentence = "The answer is blown'in the wind.", lang = "en_US", extentInfoJson = "{}")
+    claim = KnowledgeForParser(propositionId=str(uuid.uuid1()), sentenceId=str(uuid.uuid1()), knowledge = knowledge1)
+    input = InputSentenceForParser(premise=[], claim=[claim])
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json", "X_TOPOSOID_TRANSVERSAL_STATE": transversalState},
-                        json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "The answer is blown'in the wind.","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}]})    
+                        json=jsonable_encoder(input))    
     assert response.status_code == 200
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     assert len(asos.analyzedSentenceObjects) == 1
@@ -60,9 +68,14 @@ def test_PremiseEnmptyAndClaimOneSentence():
 
 
 def test_NegativeSimpleSentence():
+
+    knowledge1 = Knowledge(sentence = "The problem does not seem soluble.", lang = "en_US", extentInfoJson = "{}")
+    claim = KnowledgeForParser(propositionId=str(uuid.uuid1()), sentenceId=str(uuid.uuid1()), knowledge = knowledge1)
+    input = InputSentenceForParser(premise=[], claim=[claim])
+  
     response = client.post("/analyze",
                             headers={"Content-Type": "application/json", "X_TOPOSOID_TRANSVERSAL_STATE": transversalState},
-                            json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge": {"sentence": "The problem does not seem soluble.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}]})    
+                            json=jsonable_encoder(input))    
     assert response.status_code == 200
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     for aso in asos.analyzedSentenceObjects:
@@ -81,9 +94,15 @@ def test_NegativeSimpleSentence():
 
 
 def test_PremiseOneSentencetyAndClaimOneSentence():
+    knowledge1 = Knowledge(sentence = "You may say I'm a dreamer, But I'm not the only one.", lang = "en_US", extentInfoJson = "{}")
+    knowledge2 = Knowledge(sentence = "I hope someday you'll join us And the world will live as one.", lang = "en_US", extentInfoJson = "{}")
+    premise = KnowledgeForParser(propositionId=str(uuid.uuid1()), sentenceId=str(uuid.uuid1()), knowledge = knowledge1)
+    claim = KnowledgeForParser(propositionId=str(uuid.uuid1()), sentenceId=str(uuid.uuid1()), knowledge = knowledge2)
+    input = InputSentenceForParser(premise=[premise], claim=[claim])
+
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json", "X_TOPOSOID_TRANSVERSAL_STATE": transversalState},
-                        json={"premise": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "You may say I'm a dreamer, But I'm not the only one.","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "I hope someday you'll join us And the world will live as one.","lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}]})    
+                        json=jsonable_encoder(input))    
     assert response.status_code == 200
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     assert len(asos.analyzedSentenceObjects) == 2
@@ -98,9 +117,20 @@ def test_PremiseOneSentencetyAndClaimOneSentence():
             pytest.fail("Unexpected Error ..")
 
 def test_PremiseMultipleSentencetyAndClaimMultipleSentence():
+
+    knowledge1 = Knowledge(sentence = "Just The Way You Are!", lang = "en_US", extentInfoJson = "{}")
+    knowledge2 = Knowledge(sentence = "The answer is blown'in the wind.", lang = "en_US", extentInfoJson = "{}")
+    knowledge3 = Knowledge(sentence = "You may say I'm a dreamer, But I'm not the only one.", lang = "en_US", extentInfoJson = "{}")
+    knowledge4 = Knowledge(sentence = "I hope someday you'll join us And the world will live as one.", lang = "en_US", extentInfoJson = "{}")
+    premise1 = KnowledgeForParser(propositionId=str(uuid.uuid1()), sentenceId=str(uuid.uuid1()), knowledge = knowledge1)
+    premise2 = KnowledgeForParser(propositionId=str(uuid.uuid1()), sentenceId=str(uuid.uuid1()), knowledge = knowledge2)
+    claim1 = KnowledgeForParser(propositionId=str(uuid.uuid1()), sentenceId=str(uuid.uuid1()), knowledge = knowledge3)
+    claim2 = KnowledgeForParser(propositionId=str(uuid.uuid1()), sentenceId=str(uuid.uuid1()), knowledge = knowledge4)
+    input = InputSentenceForParser(premise=[premise1, premise2], claim=[claim1, claim2])
+
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json", "X_TOPOSOID_TRANSVERSAL_STATE": transversalState},
-                        json={"premise": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "Just The Way You Are!","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}, {"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "The answer is blown'in the wind.","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "You may say I'm a dreamer, But I'm not the only one.","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}, {"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "I hope someday you'll join us And the world will live as one.","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}]})    
+                        json=jsonable_encoder(input))    
     assert response.status_code == 200
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     assert len(asos.analyzedSentenceObjects) == 4
@@ -116,9 +146,14 @@ def test_PremiseMultipleSentencetyAndClaimMultipleSentence():
 
 
 def test_SimpleSentenceWithQuantitativeExpressions0():
+
+    knowledge1 = Knowledge(sentence = "His weight is 70kg.", lang = "en_US", extentInfoJson = "{}")
+    claim = KnowledgeForParser(propositionId=str(uuid.uuid1()), sentenceId=str(uuid.uuid1()), knowledge = knowledge1)
+    input = InputSentenceForParser(premise=[], claim=[claim])
+
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json", "X_TOPOSOID_TRANSVERSAL_STATE": transversalState},
-                        json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge": {"sentence": "His weight is 70kg.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}]})    
+                        json=jsonable_encoder(input))    
     assert response.status_code == 200
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     for aso in asos.analyzedSentenceObjects:
@@ -145,9 +180,13 @@ def test_SimpleSentenceWithQuantitativeExpressions0():
         assert prefix == "KILO"
 
 def test_SimpleSentenceWithQuantitativeExpressions1():
+    knowledge1 = Knowledge(sentence = "His weight is over 70kg.", lang = "en_US", extentInfoJson = "{}")
+    claim = KnowledgeForParser(propositionId=str(uuid.uuid1()), sentenceId=str(uuid.uuid1()), knowledge = knowledge1)
+    input = InputSentenceForParser(premise=[], claim=[claim])
+
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json", "X_TOPOSOID_TRANSVERSAL_STATE": transversalState},
-                        json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "His weight is over 70kg.","lang": "en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}]})                           
+                        json=jsonable_encoder(input))                           
     assert response.status_code == 200
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     for aso in asos.analyzedSentenceObjects:
@@ -175,9 +214,13 @@ def test_SimpleSentenceWithQuantitativeExpressions1():
         assert prefix == "KILO"
 
 def test_SimpleSentenceWithQuantitativeExpressions2():
+    knowledge1 = Knowledge(sentence = "Its stock price has risen by more than $ 10.", lang = "en_US", extentInfoJson = "{}")
+    claim = KnowledgeForParser(propositionId=str(uuid.uuid1()), sentenceId=str(uuid.uuid1()), knowledge = knowledge1)
+    input = InputSentenceForParser(premise=[], claim=[claim])
+
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json", "X_TOPOSOID_TRANSVERSAL_STATE": transversalState},
-                        json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "Its stock price has risen by more than $ 10.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}]})    
+                        json=jsonable_encoder(input))    
     assert response.status_code == 200
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     for aso in asos.analyzedSentenceObjects:
@@ -205,9 +248,14 @@ def test_SimpleSentenceWithQuantitativeExpressions2():
         assert prefix == ""
 
 def test_SimpleSentenceWithQuantitativeExpressions3():
+
+    knowledge1 = Knowledge(sentence = "The height limit is 170cm.", lang = "en_US", extentInfoJson = "{}")
+    claim = KnowledgeForParser(propositionId=str(uuid.uuid1()), sentenceId=str(uuid.uuid1()), knowledge = knowledge1)
+    input = InputSentenceForParser(premise=[], claim=[claim])
+
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json", "X_TOPOSOID_TRANSVERSAL_STATE": transversalState},
-                        json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "The height limit is 170cm.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}]})    
+                        json=jsonable_encoder(input))    
     assert response.status_code == 200
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     for aso in asos.analyzedSentenceObjects:
@@ -235,9 +283,14 @@ def test_SimpleSentenceWithQuantitativeExpressions3():
         assert prefix == "CENTI"
     
 def test_SimpleSentenceWithQuantitativeExpressions4():
+
+    knowledge1 = Knowledge(sentence = "The deadline was April 1, 2022.", lang = "en_US", extentInfoJson = "{}")
+    claim = KnowledgeForParser(propositionId=str(uuid.uuid1()), sentenceId=str(uuid.uuid1()), knowledge = knowledge1)
+    input = InputSentenceForParser(premise=[], claim=[claim])
+
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json", "X_TOPOSOID_TRANSVERSAL_STATE": transversalState},
-                        json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "The deadline was April 1, 2022.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}]})    
+                        json=jsonable_encoder(input))    
     #The deadline was April 1, 2022.
     #The deadline is from April 2022 to April 2023.
     assert response.status_code == 200
@@ -265,9 +318,13 @@ def test_SimpleSentenceWithQuantitativeExpressions4():
     
 
 def test_SimpleSentenceWithQuantitativeExpressions5():
+    knowledge1 = Knowledge(sentence = "The deadline was 23:59:59.", lang = "en_US", extentInfoJson = "{}")
+    claim = KnowledgeForParser(propositionId=str(uuid.uuid1()), sentenceId=str(uuid.uuid1()), knowledge = knowledge1)
+    input = InputSentenceForParser(premise=[], claim=[claim])
+
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json", "X_TOPOSOID_TRANSVERSAL_STATE": transversalState},
-                        json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge":{"sentence": "The deadline was 23:59:59.", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}]})    
+                        json=jsonable_encoder(input))    
     assert response.status_code == 200
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     for aso in asos.analyzedSentenceObjects:
@@ -296,9 +353,13 @@ def test_SimpleSentenceWithQuantitativeExpressions5():
 
 def test_IrregularSimpleSentence():
     try:
+        knowledge1 = Knowledge(sentence = "!#$%&Y'\"UIO\n strange =*+<H`OJWKFHgb", lang = "en_US", extentInfoJson = "{}")
+        claim = KnowledgeForParser(propositionId=str(uuid.uuid1()), sentenceId=str(uuid.uuid1()), knowledge = knowledge1)
+        input = InputSentenceForParser(premise=[], claim=[claim])
+
         response = client.post("/analyze",
                             headers={"Content-Type": "application/json", "X_TOPOSOID_TRANSVERSAL_STATE": transversalState},
-                            json={"premise": [], "claim": [{"propositionId": "612bf3d6-bdb5-47b9-a3a6-185015c8c414", "sentenceId": "4a2994a1-ec7a-438b-a290-0cfb563a5170", "knowledge": {"sentence": "!#$%&Y'\"UIO\n strange =*+<H`OJWKFHgb", "lang":"en_US", "extentInfoJson": "{}", "isNegativeSentence":False, "knowledgeForImages": []}}]})    
+                            json=jsonable_encoder(input))    
         assert response.status_code == 200
         asos = AnalyzedSentenceObjects.parse_obj(response.json())
     
