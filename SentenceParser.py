@@ -15,7 +15,8 @@
  '''
 
 import spacy
-from model import KnowledgeForParser, KnowledgeBaseNode, LocalContext, PredicateArgumentStructure, KnowledgeBaseEdge, AnalyzedSentenceObject, DeductionResult, LocalContextForFeature, KnowledgeBaseSemiGlobalNode, CoveredPropositionResult, CoveredPropositionEdge
+#from _model import KnowledgeForParser, KnowledgeBaseNode, LocalContext, PredicateArgumentStructure, KnowledgeBaseEdge, AnalyzedSentenceObject, DeductionResult, LocalContextForFeature, KnowledgeBaseSemiGlobalNode, CoveredPropositionResult, CoveredPropositionEdge
+from ToposoidCommon.model import KnowledgeForParser, KnowledgeBaseNode, LocalContext, PredicateArgumentStructure, KnowledgeBaseEdge, AnalyzedSentenceObject, DeductionResult, LocalContextForFeature, KnowledgeBaseSemiGlobalNode, CoveredPropositionResult, CoveredPropositionEdge
 from NamedEntityRecognition import NamedEntityRecognition
 import uuid
 import os
@@ -63,6 +64,7 @@ class SentenceParser():
         edgeList = []
         propositionId = knowledgeForParser.propositionId
         sentenceId = knowledgeForParser.sentenceId
+        documentId = knowledgeForParser.knowledge.knowledgeForDocument.id
         beginIndex = 0        
         nerInfo = self.namedEntityRecognition.getNerAndSpanExpression(knowledgeForParser.knowledge.sentence)
 
@@ -133,9 +135,9 @@ class SentenceParser():
                 ))
         localContextForFeature = LocalContextForFeature(lang=knowledgeForParser.knowledge.lang, knowledgeFeatureReferences=[])
         knowledgeBaseSemiGlobalNode = KnowledgeBaseSemiGlobalNode(
-            nodeId = sentenceId, 
+            sentenceId = sentenceId, 
             propositionId = propositionId,
-            sentenceId = sentenceId,
+            documentId = documentId,
             sentence = knowledgeForParser.knowledge.sentence,
             sentenceType = sentenceType,
             localContextForFeature = localContextForFeature,            
