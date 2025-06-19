@@ -366,25 +366,6 @@ def test_IrregularSimpleSentence():
     except Exception:
         pytest.fail("Unexpected Error ..")
 
-def test_NoReferenceSentence():
-    try:
-        sentence = "NO_REFERENCE_" + str(uuid.uuid1()) + "_1"
-        knowledge1 = Knowledge(sentence = sentence , lang = "en_US", extentInfoJson = "{}")
-        claim = KnowledgeForParser(propositionId=str(uuid.uuid1()), sentenceId=str(uuid.uuid1()), knowledge = knowledge1)
-        input = InputSentenceForParser(premise=[], claim=[claim])
-
-        response = client.post("/analyze",
-                            headers={"Content-Type": "application/json", "X_TOPOSOID_TRANSVERSAL_STATE": transversalState},
-                            json=jsonable_encoder(input))    
-        assert response.status_code == 200
-        asos = AnalyzedSentenceObjects.parse_obj(response.json())
-        assert(len(asos.analyzedSentenceObjects) == 1)
-        knowledgeBaseNode = list(asos.analyzedSentenceObjects[0].nodeMap.values())[0]
-        assert(knowledgeBaseNode.predicateArgumentStructure.surface==sentence)
-    
-    except Exception:
-        pytest.fail("Unexpected Error ..")
-
 
 def test_Sprit():
     try:

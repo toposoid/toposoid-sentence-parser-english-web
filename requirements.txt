@@ -9,4 +9,4 @@ spacy-loggers==1.0.1
 blis==1.2.0
 typing_extensions==4.8.0
 numpy==1.21.4
--e git+https://github.com/toposoid/toposoid-python-lib.git@feature#egg=ToposoidCommon
+-e git+https://__##GIT_TOKEN##__@github.com/toposoid/toposoid-python-lib.git@main#egg=ToposoidCommon
