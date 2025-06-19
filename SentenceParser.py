@@ -55,167 +55,99 @@ class SentenceParser():
                     # go to search for the node recursively and get information until it reaches the end.
                     result = result.union(self.getPremiseNode(doc, node, result))
         return result
-    
-    def parseNoReferenceSentence(self, knowledgeForParser):
+
+
+    # main function
+    def parse(self, knowledgeForParser:KnowledgeForParser, sentenceType:int):
+
+        doc = self.nlp(knowledgeForParser.knowledge.sentence)
+        extractInfo = self.extractPreInfo(doc)    
         nodeMap = {}
         edgeList = []
         propositionId = knowledgeForParser.propositionId
         sentenceId = knowledgeForParser.sentenceId
         documentId = knowledgeForParser.knowledge.knowledgeForDocument.id
+        beginIndex = 0        
+        nerInfo = self.namedEntityRecognition.getNerAndSpanExpression(knowledgeForParser.knowledge.sentence)
 
-        localContext = LocalContext(
-            lang = knowledgeForParser.knowledge.lang,
-            namedEntity = "",
-            rangeExpressions = {},
-            categories = {},
-            domains = {},
-            knowledgeFeatureReferences = []
-        )
-        
-        caseType = ""
-        if knowledgeForParser.knowledge.lang == "ja_JP":
-            caseType = "文末"
-        elif knowledgeForParser.knowledge.lang == "en_US":
-            caseType = "ROOT"
+        for token in doc:        
+            if sentenceType == "-1": 
+                #For registration
+                nodeType = 1
+                if "premiseNode" in  extractInfo and token.i in extractInfo["premiseNode"]:
+                    nodeType = 0
+            else:
+                #For reasoning
+                nodeType = sentenceType
+            isDenial = False
+            if "isDenialWord" in extractInfo and token.i in extractInfo["isDenialWord"]:
+                isDenial = True
+            isConditionalConnection = False
+            if "isConditionalConnection" in extractInfo and token.i in extractInfo["isConditionalConnection"]:
+                isConditionalConnection = True            
+                        
+            nerExp, rangeExp = self.extractNerAndRange(beginIndex, nerInfo)
+            beginIndex = beginIndex + len(token.text) + 1
 
-        predicateArgumentStructure = PredicateArgumentStructure(
-            currentId = 0,
-            parentId = -1,
-            isMainSection = True,
-            surface = knowledgeForParser.knowledge.sentence,
-            normalizedName = knowledgeForParser.knowledge.sentence,
-            dependType = "-",
-            caseType = caseType,
-            isDenialWord = False,
-            isConditionalConnection = False,
-            surfaceYomi = "",
-            normalizedNameYomi = "",
-            modalityType =  "-",
-            parallelType = "-",
-            nodeType = 1,
-            morphemes = ["-"]
-        )
+            localContext = LocalContext(
+                lang = knowledgeForParser.knowledge.lang,
+                namedEntity = nerExp,
+                rangeExpressions = rangeExp,
+                categories = {},
+                domains = {},
+                knowledgeFeatureReferences = []
+            )
+            
+            predicateArgumentStructure = PredicateArgumentStructure(
+                currentId = token.i,
+                parentId = token.head.i,
+                isMainSection = True,
+                surface = token.text,
+                normalizedName = token.lemma_,
+                dependType = "-",
+                caseType = token.dep_,
+                isDenialWord = isDenial,
+                isConditionalConnection = isConditionalConnection,
+                surfaceYomi = "",
+                normalizedNameYomi = "",
+                modalityType =  "-",
+                parallelType = "-",
+                nodeType = nodeType,
+                morphemes = [token.pos_]
+            )
 
-        node = KnowledgeBaseNode(
-            nodeId = sentenceId + "-" + str(0),
-            propositionId = propositionId,
-            sentenceId = sentenceId,
-            predicateArgumentStructure = predicateArgumentStructure,
-            localContext = localContext,
-        )
-
-        nodeMap[sentenceId + "-" + str(0)] = node
-        
+            node = KnowledgeBaseNode(
+                nodeId = sentenceId + "-" + str(token.i),
+                propositionId = propositionId,
+                sentenceId = sentenceId,
+                predicateArgumentStructure = predicateArgumentStructure,
+                localContext = localContext,
+            )
+            nodeMap[sentenceId + "-" + str(token.i)] = node
+            
+            if token.i != token.head.i:
+                edgeList.append(KnowledgeBaseEdge(
+                    sourceId = sentenceId + "-" + str(token.i),
+                    destinationId = sentenceId + "-" + str(token.head.i),
+                    caseStr = token.dep_,
+                    dependType = "-",
+                    parallelType = "-",
+                    hasInclusion = isConditionalConnection,
+                    logicType = "-"                    
+                ))
         localContextForFeature = LocalContextForFeature(lang=knowledgeForParser.knowledge.lang, knowledgeFeatureReferences=[])
         knowledgeBaseSemiGlobalNode = KnowledgeBaseSemiGlobalNode(
             sentenceId = sentenceId, 
             propositionId = propositionId,
             documentId = documentId,
             sentence = knowledgeForParser.knowledge.sentence,
-            sentenceType = 1,
+            sentenceType = sentenceType,
             localContextForFeature = localContextForFeature,            
         )
 
         defaultDeductionResult = DeductionResult(status=False, coveredPropositionResults = [])
         aso = AnalyzedSentenceObject(nodeMap=nodeMap, edgeList=edgeList, knowledgeBaseSemiGlobalNode=knowledgeBaseSemiGlobalNode, deductionResult=defaultDeductionResult)
-
         return aso
-
-
-    # main function
-    def parse(self, knowledgeForParser:KnowledgeForParser, sentenceType:int):
-
-        if re.search("^NO_REFERENCE_.+_[0-9]+$", knowledgeForParser.knowledge.sentence):
-            return self.parseNoReferenceSentence(knowledgeForParser)
-        else:
-            doc = self.nlp(knowledgeForParser.knowledge.sentence)
-            extractInfo = self.extractPreInfo(doc)    
-            nodeMap = {}
-            edgeList = []
-            propositionId = knowledgeForParser.propositionId
-            sentenceId = knowledgeForParser.sentenceId
-            documentId = knowledgeForParser.knowledge.knowledgeForDocument.id
-            beginIndex = 0        
-            nerInfo = self.namedEntityRecognition.getNerAndSpanExpression(knowledgeForParser.knowledge.sentence)
-
-            for token in doc:        
-                if sentenceType == "-1": 
-                    #For registration
-                    nodeType = 1
-                    if "premiseNode" in  extractInfo and token.i in extractInfo["premiseNode"]:
-                        nodeType = 0
-                else:
-                    #For reasoning
-                    nodeType = sentenceType
-                isDenial = False
-                if "isDenialWord" in extractInfo and token.i in extractInfo["isDenialWord"]:
-                    isDenial = True
-                isConditionalConnection = False
-                if "isConditionalConnection" in extractInfo and token.i in extractInfo["isConditionalConnection"]:
-                    isConditionalConnection = True            
-                            
-                nerExp, rangeExp = self.extractNerAndRange(beginIndex, nerInfo)
-                beginIndex = beginIndex + len(token.text) + 1
-
-                localContext = LocalContext(
-                    lang = knowledgeForParser.knowledge.lang,
-                    namedEntity = nerExp,
-                    rangeExpressions = rangeExp,
-                    categories = {},
-                    domains = {},
-                    knowledgeFeatureReferences = []
-                )
-                
-                predicateArgumentStructure = PredicateArgumentStructure(
-                    currentId = token.i,
-                    parentId = token.head.i,
-                    isMainSection = True,
-                    surface = token.text,
-                    normalizedName = token.lemma_,
-                    dependType = "-",
-                    caseType = token.dep_,
-                    isDenialWord = isDenial,
-                    isConditionalConnection = isConditionalConnection,
-                    surfaceYomi = "",
-                    normalizedNameYomi = "",
-                    modalityType =  "-",
-                    parallelType = "-",
-                    nodeType = nodeType,
-                    morphemes = [token.pos_]
-                )
-
-                node = KnowledgeBaseNode(
-                    nodeId = sentenceId + "-" + str(token.i),
-                    propositionId = propositionId,
-                    sentenceId = sentenceId,
-                    predicateArgumentStructure = predicateArgumentStructure,
-                    localContext = localContext,
-                )
-                nodeMap[sentenceId + "-" + str(token.i)] = node
-                
-                if token.i != token.head.i:
-                    edgeList.append(KnowledgeBaseEdge(
-                        sourceId = sentenceId + "-" + str(token.i),
-                        destinationId = sentenceId + "-" + str(token.head.i),
-                        caseStr = token.dep_,
-                        dependType = "-",
-                        parallelType = "-",
-                        hasInclusion = isConditionalConnection,
-                        logicType = "-"                    
-                    ))
-            localContextForFeature = LocalContextForFeature(lang=knowledgeForParser.knowledge.lang, knowledgeFeatureReferences=[])
-            knowledgeBaseSemiGlobalNode = KnowledgeBaseSemiGlobalNode(
-                sentenceId = sentenceId, 
-                propositionId = propositionId,
-                documentId = documentId,
-                sentence = knowledgeForParser.knowledge.sentence,
-                sentenceType = sentenceType,
-                localContextForFeature = localContextForFeature,            
-            )
-
-            defaultDeductionResult = DeductionResult(status=False, coveredPropositionResults = [])
-            aso = AnalyzedSentenceObject(nodeMap=nodeMap, edgeList=edgeList, knowledgeBaseSemiGlobalNode=knowledgeBaseSemiGlobalNode, deductionResult=defaultDeductionResult)
-            return aso
 
     #Get named entity and quantity range representation from words starting with a character index.
     def extractNerAndRange(self, beginIndex, nerInfo):
