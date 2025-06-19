@@ -53,3 +53,4 @@ jobs:
           build-args: |
             TARGET_BRANCH=${{ env.PJ_BRANCH }}
             PIPELINES_MODEL=en_core_web_md
+            GIT_TOKEN=${{ secrets.GIT_TOKEN }}
