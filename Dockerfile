@@ -14,7 +14,7 @@ RUN apt-get update \
 && git checkout ${TARGET_BRANCH} \
 && sed -i s/__##GIT_TOKEN##__/${GIT_TOKEN}/g requirements.txt \
 && pip install --no-cache-dir --trusted-host pypi.python.org -r requirements.txt \
-&& python -m spacy download ${PIPELINES_MODEL}
+&& python -m spacy download ${PIPELINES_MODEL} \
 && rm -f requirements.txt
 
 
