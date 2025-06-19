@@ -45,6 +45,7 @@ jobs:
           build-args: |
             TARGET_BRANCH=${{ env.PJ_BRANCH }}
             PIPELINES_MODEL=en_core_web_lg
+            GIT_TOKEN=${{ secrets.GIT_TOKEN }}
       - name: Build And Push Docker Image For Test
         uses: docker/build-push-action@v3
         with:
