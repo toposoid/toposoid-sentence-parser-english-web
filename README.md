@@ -5,8 +5,7 @@ This Microservice analyzes dependency's structure of English sentences and outpu
 
 [![Test And Build](https://github.com/toposoid/toposoid-sentence-parser-english-web/actions/workflows/action.yml/badge.svg)](https://github.com/toposoid/toposoid-sentence-parser-english-web/actions/workflows/action.yml)
 
-<img width="1151"  src="https://github.com/toposoid/toposoid-sentence-parser-english-web/assets/82787843/622291ce-a45c-4161-aec9-53460833aea0">
-
+<img width="1071" alt="Image" src="https://github.com/user-attachments/assets/133f018d-c17c-4fa6-adb1-ca73f839661e" />
 
 ## Requirements
 * Docker version 20.10.x, or later
@@ -14,7 +13,7 @@ This Microservice analyzes dependency's structure of English sentences and outpu
 
 ### Memory requirements For Standalone
 * Required: at least 3GB of RAM
-* Required: at least 1.24GB of HDD(Docker Image Size)
+* Required: at least 1.48GB of HDD(Docker Image Size)
 
 ## Setup For Standalone
 ```bssh
