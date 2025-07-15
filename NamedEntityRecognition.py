@@ -34,26 +34,29 @@ class NamedEntityRecognition():
         for sentenceDict in result["sentences"]:
             tokens = sentenceDict["tokens"]
             for nerElement in sentenceDict["entitymentions"]:
-                word = nerElement["text"]                
-                ner = nerElement["ner"] 
-                begin = int(nerElement["characterOffsetBegin"]) 
-                end = int(nerElement["characterOffsetEnd"])
-                unit = ""
-                quantitiy = ""
-                range = ""
-                prefix = ""
-                if "normalizedNER" in nerElement:
-                    range = nerElement["normalizedNER"]
-                    quantitiy = re.sub(r"[^\d.]", "", range)
-                    if ner == "DATE":
-                        quantitiy = nerElement["normalizedNER"]
-                    elif ner == "TIME":
-                        #remove first T
-                        range = nerElement["normalizedNER"][1:]
-                        quantitiy = nerElement["normalizedNER"][1:]
+                try:
+                    word = nerElement["text"]                
+                    ner = nerElement["ner"] 
+                    begin = int(nerElement["characterOffsetBegin"]) 
+                    end = int(nerElement["characterOffsetEnd"])
+                    unit = ""
+                    quantitiy = ""
+                    range = ""
+                    prefix = ""
+                    if "normalizedNER" in nerElement:
+                        range = nerElement["normalizedNER"]
+                        quantitiy = re.sub(r"[^\d.]", "", range)
+                        if ner == "DATE":
+                            quantitiy = nerElement["normalizedNER"]
+                        elif ner == "TIME":
+                            #remove first T
+                            range = nerElement["normalizedNER"][1:]
+                            quantitiy = nerElement["normalizedNER"][1:]
 
-                    prefix, unit = self.getPrefixAndUnit(range, quantitiy, tokens[int(nerElement["tokenEnd"])])                    
-                nerResult.append({"word":word, "ner":ner, "begin":begin, "end":end, "quantity":quantitiy, "unit":unit, "range":range, "prefix": prefix})                                 
+                        prefix, unit = self.getPrefixAndUnit(range, quantitiy, tokens[int(nerElement["tokenEnd"])])                    
+                    nerResult.append({"word":word, "ner":ner, "begin":begin, "end":end, "quantity":quantitiy, "unit":unit, "range":range, "prefix": prefix})                                 
+                except:
+                    pass
         return nerResult
 
     #Attempt to get the unit of quantity expression

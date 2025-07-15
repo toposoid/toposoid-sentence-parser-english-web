@@ -366,6 +366,41 @@ def test_IrregularSimpleSentence():
     except Exception:
         pytest.fail("Unexpected Error ..")
 
+def test_IrregularLongSentence():
+    try:
+        #knowledge1 = Knowledge(sentence = "----------------------------・・・・・・・・・・・・・・・・・・・!#$%&Y'\"UIO\n strange =NO_REFERENCE_5d9afee2-4c10-11f0-9f26-acde48001122_10*+<H`OJWKFHgb", lang = "en_US", extentInfoJson = "{}")
+        knowledge1 = Knowledge(sentence = "NO_REFERENCE_5d9afee2-4c10-11f0-9f26-acde48001122_10_NO_REFERENCE_5d9afee2-4c10-11f0-9f26-acde48001122_10", lang = "en_US", extentInfoJson = "{}")
+        claim = KnowledgeForParser(propositionId=str(uuid.uuid1()), sentenceId=str(uuid.uuid1()), knowledge = knowledge1)
+        input = InputSentenceForParser(premise=[], claim=[claim])
+
+        response = client.post("/analyze",
+                            headers={"Content-Type": "application/json", "X_TOPOSOID_TRANSVERSAL_STATE": transversalState},
+                            json=jsonable_encoder(input))    
+        assert response.status_code == 200
+        asos = AnalyzedSentenceObjects.parse_obj(response.json())
+    
+    except Exception:
+        pytest.fail("Unexpected Error ..")
+
+def test_IrregularLongSentence2():
+    try:
+        knowledge1 = Knowledge(sentence = "All notices hereunder and communications regarding interpretation of the terms of this Agreement and changes thereto, shall be effected by the mailing thereof by registered or certified mail, return receipt requested, postage prepaid, and addressed as follows: CONSULTANT: __________(CONSULTANT)_______________ __________(NAME)________, Project Manager  __________(ADDRESS)____________________ COMMISSION: Santa Cruz County Regional Transportation Commission (SCCRTC)  Luis Mendez, Contract Manager 1523 Pacific Ave, Santa Cruz, CA 95060", lang = "en_US", extentInfoJson = "{}")
+        claim = KnowledgeForParser(propositionId=str(uuid.uuid1()), sentenceId=str(uuid.uuid1()), knowledge = knowledge1)
+        input = InputSentenceForParser(premise=[], claim=[claim])
+
+        response = client.post("/analyze",
+                            headers={"Content-Type": "application/json", "X_TOPOSOID_TRANSVERSAL_STATE": transversalState},
+                            json=jsonable_encoder(input))    
+        assert response.status_code == 200
+        asos = AnalyzedSentenceObjects.parse_obj(response.json())
+    
+    except Exception:
+        pytest.fail("Unexpected Error ..")
+
+
+
+
+
 
 def test_Sprit():
     try:
