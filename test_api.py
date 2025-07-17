@@ -397,6 +397,20 @@ def test_IrregularLongSentence2():
     except Exception:
         pytest.fail("Unexpected Error ..")
 
+def test_IrregularLongSentence3():
+    try:
+        knowledge1 = Knowledge(sentence = "G.CONSULTANT shall not exceed milestone cost estimates as shown in Exhibit B, except with the prior written approval of the Contract Manager.", lang = "en_US", extentInfoJson = "{}")
+        claim = KnowledgeForParser(propositionId=str(uuid.uuid1()), sentenceId=str(uuid.uuid1()), knowledge = knowledge1)
+        input = InputSentenceForParser(premise=[], claim=[claim])
+
+        response = client.post("/analyze",
+                            headers={"Content-Type": "application/json", "X_TOPOSOID_TRANSVERSAL_STATE": transversalState},
+                            json=jsonable_encoder(input))    
+        assert response.status_code == 200
+        asos = AnalyzedSentenceObjects.parse_obj(response.json())
+    
+    except Exception:
+        pytest.fail("Unexpected Error ..")
 
 
 
