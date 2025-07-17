@@ -39,12 +39,16 @@ class SentenceParser():
                 result["isDenialWord"].append(token.head.i)
             if token.pos_ == "SCONJ" and token.head != None:
                 result["isConditionalConnection"].append(token.head.i)
-                result["premiseNode"] = self.getPremiseNode(doc, token.head, {token.head.i})
+                try:
+                    #Not used at the moment
+                    result["premiseNode"] = self.getPremiseNode(doc, token.head, {token.head.i}, token.head)
+                except:
+                    pass
         return result
 
     #Specify the range of clauses that express the premise
-    def getPremiseNode(self, doc, targetToken, result):
-        premiseNodes = list(filter(lambda x: x.head.i == targetToken.i and not x.dep_ in ["advcl", "relcl"], doc))
+    def getPremiseNode(self, doc, targetToken, result, conditilnalToken):
+        premiseNodes = list(filter(lambda x: x.head.i == targetToken.i and x.i > conditilnalToken.i and not x.dep_ in ["advcl", "relcl"], doc))
         result = result.union(set(map(lambda y: y.i, premiseNodes)))
         for node in premiseNodes:
             #if len(list(node.children)) > 0:
@@ -53,7 +57,7 @@ class SentenceParser():
                 if not child.i in result:
                     #If there is a children's nodes which parent is the node, 
                     # go to search for the node recursively and get information until it reaches the end.
-                    result = result.union(self.getPremiseNode(doc, node, result))
+                    result = result.union(self.getPremiseNode(doc, node, result,conditilnalToken))
         return result
 
 
