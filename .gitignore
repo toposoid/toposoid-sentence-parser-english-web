@@ -130,4 +130,6 @@ dmypy.json
 .vscode/
 .DS_Store
 logs/
-
+docker-compose-local.yml
+.python-version
+src

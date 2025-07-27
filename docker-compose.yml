@@ -1,7 +1,7 @@
 version: '3'
 services:
   toposoid-sentence-parser-english-web:
-    image: toposoid/toposoid-sentence-parser-english-web:0.5-lowspec
+    image: toposoid/toposoid-sentence-parser-english-web:0.6
     environment:
       - TOPOSOID_CORENLP_HOST=corenlp
       - TOPOSOID_PARSER_SPACY_MODEL_EN=en_core_web_md
