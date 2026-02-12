@@ -133,3 +133,5 @@ logs/
 docker-compose-local.yml
 .python-version
 src
+.devcontainer
+docker-compose-dev.yml

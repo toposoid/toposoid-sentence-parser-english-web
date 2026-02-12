@@ -1,0 +1,23 @@
+[project]
+name = "toposoid-sentence-parser-english-web"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "blis==1.2.0",
+    "fastapi[all]==0.112.0",
+    "numpy==1.21.4",
+    "pip>=26.0.1",
+    "pydantic==2.8.2",
+    "pytest==8.0.2",
+    "spacy==3.8.4",
+    "spacy-loggers==1.0.1",
+    "toposoid-python-lib",
+    "typing-extensions==4.12.2",
+    "uvicorn[standard]==0.15.0",
+    "wheel==0.37.0",
+]
+
+[tool.uv.sources]
+toposoid-python-lib = { git = "https://github.com/toposoid/toposoid-python-lib.git", rev = "feature" }
