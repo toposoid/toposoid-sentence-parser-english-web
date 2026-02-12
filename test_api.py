@@ -22,6 +22,7 @@ import pytest
 from functools import reduce
 from fastapi.encoders import jsonable_encoder
 import uuid
+from ToposoidCommon import SentenceType
 #This is a unit test module
 client = TestClient(app)
 transversalState = str(jsonable_encoder(TransversalState(userId="test-user", username="guest", roleId=0, csrfToken = "")))
@@ -61,7 +62,7 @@ def test_PremiseEnmptyAndClaimOneSentence():
     asos = AnalyzedSentenceObjects.parse_obj(response.json())
     assert len(asos.analyzedSentenceObjects) == 1
     aso = asos.analyzedSentenceObjects[0]
-    assert aso.knowledgeBaseSemiGlobalNode.sentenceType == 1
+    assert aso.knowledgeBaseSemiGlobalNode.sentenceType == SentenceType.CLAIM.value
     scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.predicateArgumentStructure.currentId) 
     sentence =  reduce(lambda a, b: a + " " + b.predicateArgumentStructure.surface, scoresSorted, "")
     assert sentence.replace(" .", ".").strip() == "The answer is blown'in the wind."
@@ -109,9 +110,9 @@ def test_PremiseOneSentencetyAndClaimOneSentence():
     for aso in asos.analyzedSentenceObjects:
         scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.predicateArgumentStructure.currentId) 
         sentence =  reduce(lambda a, b: a + " " + b.predicateArgumentStructure.surface, scoresSorted, "").replace(" .", ".").replace(" ,", ",").replace(" '", "'").strip()
-        if aso.knowledgeBaseSemiGlobalNode.sentenceType == 0:
+        if aso.knowledgeBaseSemiGlobalNode.sentenceType == SentenceType.PREMISE.value:
             assert sentence == "You may say I'm a dreamer, But I'm not the only one."
-        elif aso.knowledgeBaseSemiGlobalNode.sentenceType == 1:
+        elif aso.knowledgeBaseSemiGlobalNode.sentenceType == SentenceType.CLAIM.value:
             assert sentence == "I hope someday you'll join us And the world will live as one."
         else:
             pytest.fail("Unexpected Error ..")
@@ -137,9 +138,9 @@ def test_PremiseMultipleSentencetyAndClaimMultipleSentence():
     for aso in asos.analyzedSentenceObjects:
         scoresSorted = sorted(aso.nodeMap.values(), key=lambda x:x.predicateArgumentStructure.currentId) 
         sentence =  reduce(lambda a, b: a + " " + b.predicateArgumentStructure.surface, scoresSorted, "").replace(" .", ".").replace(" ,", ",").replace(" '", "'").strip()
-        if aso.knowledgeBaseSemiGlobalNode.sentenceType == 0:
+        if aso.knowledgeBaseSemiGlobalNode.sentenceType == SentenceType.PREMISE.value:
             assert sentence == "Just The Way You Are !" or sentence == "The answer is blown'in the wind."
-        elif aso.knowledgeBaseSemiGlobalNode.sentenceType == 1:
+        elif aso.knowledgeBaseSemiGlobalNode.sentenceType == SentenceType.CLAIM.value:
             assert sentence == "You may say I'm a dreamer, But I'm not the only one." or sentence == "I hope someday you'll join us And the world will live as one."
         else:
             pytest.fail("Unexpected Error ..")

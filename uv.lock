@@ -1745,8 +1745,8 @@ wheels = [
 
 [[package]]
 name = "toposoid-python-lib"
-version = "0.1.0"
-source = { git = "https://github.com/toposoid/toposoid-python-lib.git?rev=feature#3e38d43d672427c2e7360a2296ac3fc26eca83ba" }
+version = "0.7"
+source = { git = "https://github.com/toposoid/toposoid-python-lib.git?rev=feature#eaa0e51e697d94fa821ae78425e7bafa55c55d29" }
 dependencies = [
     { name = "langdetect" },
     { name = "pydantic" },

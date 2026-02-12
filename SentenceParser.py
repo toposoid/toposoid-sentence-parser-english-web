@@ -18,8 +18,10 @@ import spacy
 #from _model import KnowledgeForParser, KnowledgeBaseNode, LocalContext, PredicateArgumentStructure, KnowledgeBaseEdge, AnalyzedSentenceObject, DeductionResult, LocalContextForFeature, KnowledgeBaseSemiGlobalNode, CoveredPropositionResult, CoveredPropositionEdge
 from ToposoidCommon.model import KnowledgeForParser, KnowledgeBaseNode, LocalContext, PredicateArgumentStructure, KnowledgeBaseEdge, AnalyzedSentenceObject, DeductionResult, LocalContextForFeature, KnowledgeBaseSemiGlobalNode, CoveredPropositionResult, CoveredPropositionEdge
 from NamedEntityRecognition import NamedEntityRecognition
+from ToposoidCommon import CaseGroupType, SentenceType
 import re
 import os
+
 
 #This module takes a sentence as input and returns the words of dependencies
 class SentenceParser():
@@ -77,9 +79,9 @@ class SentenceParser():
         for token in doc:        
             if sentenceType == "-1": 
                 #For registration
-                nodeType = 1
+                nodeType = SentenceType.CLAIM.value
                 if "premiseNode" in  extractInfo and token.i in extractInfo["premiseNode"]:
-                    nodeType = 0
+                    nodeType = SentenceType.PREMISE.value
             else:
                 #For reasoning
                 nodeType = sentenceType
@@ -119,7 +121,7 @@ class SentenceParser():
                 parallelType = "-",
                 nodeType = nodeType,
                 morphemes = [token.pos_],
-                caseGroupType = 0, #TODO enumを共通に持つ
+                caseGroupType = CaseGroupType.UNSPECIFIED.value, 
                 casePhraseId = "",
                 casePhrase = ""
             )
