@@ -18,8 +18,10 @@ import spacy
 #from _model import KnowledgeForParser, KnowledgeBaseNode, LocalContext, PredicateArgumentStructure, KnowledgeBaseEdge, AnalyzedSentenceObject, DeductionResult, LocalContextForFeature, KnowledgeBaseSemiGlobalNode, CoveredPropositionResult, CoveredPropositionEdge
 from ToposoidCommon.model import KnowledgeForParser, KnowledgeBaseNode, LocalContext, PredicateArgumentStructure, KnowledgeBaseEdge, AnalyzedSentenceObject, DeductionResult, LocalContextForFeature, KnowledgeBaseSemiGlobalNode, CoveredPropositionResult, CoveredPropositionEdge
 from NamedEntityRecognition import NamedEntityRecognition
+from ToposoidCommon import CaseGroupType, SentenceType
 import re
 import os
+
 
 #This module takes a sentence as input and returns the words of dependencies
 class SentenceParser():
@@ -77,9 +79,9 @@ class SentenceParser():
         for token in doc:        
             if sentenceType == "-1": 
                 #For registration
-                nodeType = 1
+                nodeType = SentenceType.CLAIM.value
                 if "premiseNode" in  extractInfo and token.i in extractInfo["premiseNode"]:
-                    nodeType = 0
+                    nodeType = SentenceType.PREMISE.value
             else:
                 #For reasoning
                 nodeType = sentenceType
@@ -99,7 +101,8 @@ class SentenceParser():
                 rangeExpressions = rangeExp,
                 categories = {},
                 domains = {},
-                knowledgeFeatureReferences = []
+                knowledgeFeatureReferences = [],
+                properNouns = {}
             )
             
             predicateArgumentStructure = PredicateArgumentStructure(
@@ -117,7 +120,10 @@ class SentenceParser():
                 modalityType =  "-",
                 parallelType = "-",
                 nodeType = nodeType,
-                morphemes = [token.pos_]
+                morphemes = [token.pos_],
+                caseGroupType = CaseGroupType.UNSPECIFIED.value, 
+                casePhraseId = "",
+                casePhrase = ""
             )
 
             node = KnowledgeBaseNode(
@@ -155,13 +161,20 @@ class SentenceParser():
 
     #Get named entity and quantity range representation from words starting with a character index.
     def extractNerAndRange(self, beginIndex, nerInfo):
-        nerExpression = ""
+        nerExpression = {}
         rangeExpression = {"": {}}
         if len(nerInfo) == 0: return (nerExpression, rangeExpression)
 
         hitInfo = list(filter(lambda x: x["begin"] <= beginIndex and x['end'] >= beginIndex, nerInfo))
+        
+        for element in hitInfo:
+            nerExpression[element["word"]] = element["ner"]
+            rangeExpression = {element["word"]:{"quantity":element["quantity"], "unit":element["unit"], "range":element["range"],"prefix":element["prefix"] }}
+        
+        """
         if len(hitInfo) != 0:
             nerExpression = hitInfo[0]["ner"]
             rangeExpression = {hitInfo[0]["word"]:{"quantity":hitInfo[0]["quantity"], "unit":hitInfo[0]["unit"], "range":hitInfo[0]["range"],"prefix":hitInfo[0]["prefix"] }}        
+        """
         return (nerExpression, rangeExpression)
 

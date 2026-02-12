@@ -6,7 +6,8 @@ ARG PIPELINES_MODEL
 ENV DEPLOYMENT=local
 
 RUN apt-get update \
-&& apt-get -y install git \
+&& apt-get -y install git unzip \
+&& curl -LsSf https://astral.sh/uv/install.sh | sh \
 && git clone https://github.com/toposoid/toposoid-sentence-parser-english-web.git \
 && cd toposoid-sentence-parser-english-web \
 && git fetch origin ${TARGET_BRANCH} \
