@@ -8,12 +8,12 @@ ENV DEPLOYMENT=local
 RUN apt-get update \
 && apt-get -y install git unzip \
 && curl -LsSf https://astral.sh/uv/install.sh | sh \
-&& source /${HOME}/.local/bin/env \
+&& source ${HOME}/.local/bin/env \
 && git clone https://github.com/toposoid/toposoid-sentence-parser-english-web.git \
 && cd toposoid-sentence-parser-english-web \
 && git fetch origin ${TARGET_BRANCH} \
 && git checkout ${TARGET_BRANCH} \
-&& sed -i s/__##GIT_BRANCH##__/${TARGET_BRANCH}/g pyproject.toml.template > pyproject.toml \
+&& sed s/__##GIT_BRANCH##__/${TARGET_BRANCH}/g pyproject.toml.template > pyproject.toml \
 && uv sync \
 && uv run -- spacy download ${PIPELINES_MODEL}
 
