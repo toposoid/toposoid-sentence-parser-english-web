@@ -1,4 +1,4 @@
-FROM python:3.10.13
+FROM python:3.10
 
 WORKDIR /app
 ARG TARGET_BRANCH
@@ -7,6 +7,7 @@ ENV DEPLOYMENT=local
 
 RUN apt-get update \
 && apt-get -y install git \
+&& curl -LsSf https://astral.sh/uv/install.sh | sh \
 && git clone https://github.com/toposoid/toposoid-sentence-parser-english-web.git \
 && cd toposoid-sentence-parser-english-web \
 && git fetch origin ${TARGET_BRANCH} \
