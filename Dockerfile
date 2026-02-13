@@ -5,6 +5,8 @@ ARG TARGET_BRANCH
 ARG PIPELINES_MODEL
 ENV DEPLOYMENT=local
 
+SHELL ["/bin/bash", "-c"]
+
 RUN apt-get update \
 && apt-get -y install git unzip \
 && curl -LsSf https://astral.sh/uv/install.sh | sh \
