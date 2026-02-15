@@ -13,7 +13,6 @@ dependencies = [
     "pytest==8.0.2",
     "spacy==3.8.4",
     "spacy-loggers==1.0.1",
-    "toposoid-python-lib",
     "typing-extensions==4.12.2",
     "uvicorn[standard]==0.15.0",
     "wheel==0.37.0",
