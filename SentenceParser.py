@@ -97,7 +97,7 @@ class SentenceParser():
 
             localContext = LocalContext(
                 lang = knowledgeForParser.knowledge.lang,
-                namedEntity = nerExp,
+                namedEntities = nerExp,
                 rangeExpressions = rangeExp,
                 categories = {},
                 domains = {},
