@@ -15,7 +15,7 @@
 '''
 
 from fastapi import FastAPI, Header
-from ToposoidCommon.model import InputSentenceForParser, KnowledgeForParser, AnalyzedSentenceObjects, Knowledge, SingleSentence, SurfaceInfo, TransversalState
+from ToposoidCommon.model import InputSentenceForParser, KnowledgeForParser, AnalyzedSentenceObjects, Knowledge, SingleSentence, SurfaceInfo, TransversalState, DeductionConfiguration
 from SentenceParser import SentenceParser
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
@@ -54,7 +54,8 @@ def analyze(inputSentenceForParser:InputSentenceForParser, X_TOPOSOID_TRANSVERSA
             asos.append(parser.parse(knowledgeForParser, "0"))
         for knowledgeForParser in inputSentenceForParser.claim:
             asos.append(parser.parse(knowledgeForParser, "1"))
-        response = JSONResponse(content=jsonable_encoder(AnalyzedSentenceObjects(analyzedSentenceObjects = asos)))
+        dc = DeductionConfiguration(actionModeType=inputSentenceForParser.actionModeType, llmModel="")
+        response = JSONResponse(content=jsonable_encoder(AnalyzedSentenceObjects(analyzedSentenceObjects = asos, deductionConfiguration=dc)))
         LOG.info("Parsing completed.", transversalState)        
         return response
     except Exception as e:
