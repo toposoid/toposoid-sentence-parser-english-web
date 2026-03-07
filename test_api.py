@@ -22,14 +22,14 @@ import pytest
 from functools import reduce
 from fastapi.encoders import jsonable_encoder
 import uuid
-from ToposoidCommon import SentenceType
+from ToposoidCommon import SentenceType, ActionModeType
 #This is a unit test module
 client = TestClient(app)
 transversalState = str(jsonable_encoder(TransversalState(userId="test-user", username="guest", roleId=0, csrfToken = "")))
 
 def test_PremiseAndClaimEmpty():
     try:
-        input = InputSentenceForParser(premise=[], claim=[])
+        input = InputSentenceForParser(premise=[], claim=[], actionModeType=ActionModeType.UNSPECIFIED.value)
         response = client.post("/analyze",
                             headers={"Content-Type": "application/json", "X_TOPOSOID_TRANSVERSAL_STATE": transversalState},
                             json=jsonable_encoder(input))    
@@ -43,7 +43,7 @@ def test_PremiseAndClaimEmpty():
 def test_PremiseOneSentenceAndClaimEmpty():
     knowledge1 = Knowledge(sentence = "The answer is blown'in the wind.", lang = "en_US", extentInfoJson = "{}")
     premise = KnowledgeForParser(propositionId=str(uuid.uuid1()), sentenceId=str(uuid.uuid1()), knowledge = knowledge1)
-    input = InputSentenceForParser(premise=[premise], claim=[])
+    input = InputSentenceForParser(premise=[premise], claim=[], actionModeType=ActionModeType.UNSPECIFIED.value)
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json", "X_TOPOSOID_TRANSVERSAL_STATE": transversalState},
                         json=jsonable_encoder(input))
@@ -54,7 +54,7 @@ def test_PremiseOneSentenceAndClaimEmpty():
 def test_PremiseEnmptyAndClaimOneSentence():
     knowledge1 = Knowledge(sentence = "The answer is blown'in the wind.", lang = "en_US", extentInfoJson = "{}")
     claim = KnowledgeForParser(propositionId=str(uuid.uuid1()), sentenceId=str(uuid.uuid1()), knowledge = knowledge1)
-    input = InputSentenceForParser(premise=[], claim=[claim])
+    input = InputSentenceForParser(premise=[], claim=[claim], actionModeType=ActionModeType.UNSPECIFIED.value)
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json", "X_TOPOSOID_TRANSVERSAL_STATE": transversalState},
                         json=jsonable_encoder(input))    
@@ -72,7 +72,7 @@ def test_NegativeSimpleSentence():
 
     knowledge1 = Knowledge(sentence = "The problem does not seem soluble.", lang = "en_US", extentInfoJson = "{}")
     claim = KnowledgeForParser(propositionId=str(uuid.uuid1()), sentenceId=str(uuid.uuid1()), knowledge = knowledge1)
-    input = InputSentenceForParser(premise=[], claim=[claim])
+    input = InputSentenceForParser(premise=[], claim=[claim], actionModeType=ActionModeType.UNSPECIFIED.value)
   
     response = client.post("/analyze",
                             headers={"Content-Type": "application/json", "X_TOPOSOID_TRANSVERSAL_STATE": transversalState},
@@ -99,7 +99,7 @@ def test_PremiseOneSentencetyAndClaimOneSentence():
     knowledge2 = Knowledge(sentence = "I hope someday you'll join us And the world will live as one.", lang = "en_US", extentInfoJson = "{}")
     premise = KnowledgeForParser(propositionId=str(uuid.uuid1()), sentenceId=str(uuid.uuid1()), knowledge = knowledge1)
     claim = KnowledgeForParser(propositionId=str(uuid.uuid1()), sentenceId=str(uuid.uuid1()), knowledge = knowledge2)
-    input = InputSentenceForParser(premise=[premise], claim=[claim])
+    input = InputSentenceForParser(premise=[premise], claim=[claim], actionModeType=ActionModeType.UNSPECIFIED.value)
 
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json", "X_TOPOSOID_TRANSVERSAL_STATE": transversalState},
@@ -127,7 +127,7 @@ def test_PremiseMultipleSentencetyAndClaimMultipleSentence():
     premise2 = KnowledgeForParser(propositionId=str(uuid.uuid1()), sentenceId=str(uuid.uuid1()), knowledge = knowledge2)
     claim1 = KnowledgeForParser(propositionId=str(uuid.uuid1()), sentenceId=str(uuid.uuid1()), knowledge = knowledge3)
     claim2 = KnowledgeForParser(propositionId=str(uuid.uuid1()), sentenceId=str(uuid.uuid1()), knowledge = knowledge4)
-    input = InputSentenceForParser(premise=[premise1, premise2], claim=[claim1, claim2])
+    input = InputSentenceForParser(premise=[premise1, premise2], claim=[claim1, claim2], actionModeType=ActionModeType.UNSPECIFIED.value)
 
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json", "X_TOPOSOID_TRANSVERSAL_STATE": transversalState},
@@ -150,7 +150,7 @@ def test_SimpleSentenceWithQuantitativeExpressions0():
 
     knowledge1 = Knowledge(sentence = "His weight is 70kg.", lang = "en_US", extentInfoJson = "{}")
     claim = KnowledgeForParser(propositionId=str(uuid.uuid1()), sentenceId=str(uuid.uuid1()), knowledge = knowledge1)
-    input = InputSentenceForParser(premise=[], claim=[claim])
+    input = InputSentenceForParser(premise=[], claim=[claim], actionModeType=ActionModeType.UNSPECIFIED.value)
 
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json", "X_TOPOSOID_TRANSVERSAL_STATE": transversalState},
@@ -183,7 +183,7 @@ def test_SimpleSentenceWithQuantitativeExpressions0():
 def test_SimpleSentenceWithQuantitativeExpressions1():
     knowledge1 = Knowledge(sentence = "His weight is over 70kg.", lang = "en_US", extentInfoJson = "{}")
     claim = KnowledgeForParser(propositionId=str(uuid.uuid1()), sentenceId=str(uuid.uuid1()), knowledge = knowledge1)
-    input = InputSentenceForParser(premise=[], claim=[claim])
+    input = InputSentenceForParser(premise=[], claim=[claim], actionModeType=ActionModeType.UNSPECIFIED.value)
 
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json", "X_TOPOSOID_TRANSVERSAL_STATE": transversalState},
@@ -217,7 +217,7 @@ def test_SimpleSentenceWithQuantitativeExpressions1():
 def test_SimpleSentenceWithQuantitativeExpressions2():
     knowledge1 = Knowledge(sentence = "Its stock price has risen by more than $ 10.", lang = "en_US", extentInfoJson = "{}")
     claim = KnowledgeForParser(propositionId=str(uuid.uuid1()), sentenceId=str(uuid.uuid1()), knowledge = knowledge1)
-    input = InputSentenceForParser(premise=[], claim=[claim])
+    input = InputSentenceForParser(premise=[], claim=[claim], actionModeType=ActionModeType.UNSPECIFIED.value)
 
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json", "X_TOPOSOID_TRANSVERSAL_STATE": transversalState},
@@ -252,7 +252,7 @@ def test_SimpleSentenceWithQuantitativeExpressions3():
 
     knowledge1 = Knowledge(sentence = "The height limit is 170cm.", lang = "en_US", extentInfoJson = "{}")
     claim = KnowledgeForParser(propositionId=str(uuid.uuid1()), sentenceId=str(uuid.uuid1()), knowledge = knowledge1)
-    input = InputSentenceForParser(premise=[], claim=[claim])
+    input = InputSentenceForParser(premise=[], claim=[claim], actionModeType=ActionModeType.UNSPECIFIED.value)
 
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json", "X_TOPOSOID_TRANSVERSAL_STATE": transversalState},
@@ -287,7 +287,7 @@ def test_SimpleSentenceWithQuantitativeExpressions4():
 
     knowledge1 = Knowledge(sentence = "The deadline was April 1, 2022.", lang = "en_US", extentInfoJson = "{}")
     claim = KnowledgeForParser(propositionId=str(uuid.uuid1()), sentenceId=str(uuid.uuid1()), knowledge = knowledge1)
-    input = InputSentenceForParser(premise=[], claim=[claim])
+    input = InputSentenceForParser(premise=[], claim=[claim], actionModeType=ActionModeType.UNSPECIFIED.value)
 
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json", "X_TOPOSOID_TRANSVERSAL_STATE": transversalState},
@@ -321,7 +321,7 @@ def test_SimpleSentenceWithQuantitativeExpressions4():
 def test_SimpleSentenceWithQuantitativeExpressions5():
     knowledge1 = Knowledge(sentence = "The deadline was 23:59:59.", lang = "en_US", extentInfoJson = "{}")
     claim = KnowledgeForParser(propositionId=str(uuid.uuid1()), sentenceId=str(uuid.uuid1()), knowledge = knowledge1)
-    input = InputSentenceForParser(premise=[], claim=[claim])
+    input = InputSentenceForParser(premise=[], claim=[claim], actionModeType=ActionModeType.UNSPECIFIED.value)
 
     response = client.post("/analyze",
                         headers={"Content-Type": "application/json", "X_TOPOSOID_TRANSVERSAL_STATE": transversalState},
@@ -356,7 +356,7 @@ def test_IrregularSimpleSentence():
     try:
         knowledge1 = Knowledge(sentence = "!#$%&Y'\"UIO\n strange =*+<H`OJWKFHgb", lang = "en_US", extentInfoJson = "{}")
         claim = KnowledgeForParser(propositionId=str(uuid.uuid1()), sentenceId=str(uuid.uuid1()), knowledge = knowledge1)
-        input = InputSentenceForParser(premise=[], claim=[claim])
+        input = InputSentenceForParser(premise=[], claim=[claim], actionModeType=ActionModeType.UNSPECIFIED.value)
 
         response = client.post("/analyze",
                             headers={"Content-Type": "application/json", "X_TOPOSOID_TRANSVERSAL_STATE": transversalState},
@@ -372,7 +372,7 @@ def test_IrregularLongSentence():
         #knowledge1 = Knowledge(sentence = "----------------------------・・・・・・・・・・・・・・・・・・・!#$%&Y'\"UIO\n strange =NO_REFERENCE_5d9afee2-4c10-11f0-9f26-acde48001122_10*+<H`OJWKFHgb", lang = "en_US", extentInfoJson = "{}")
         knowledge1 = Knowledge(sentence = "NO_REFERENCE_5d9afee2-4c10-11f0-9f26-acde48001122_10_NO_REFERENCE_5d9afee2-4c10-11f0-9f26-acde48001122_10", lang = "en_US", extentInfoJson = "{}")
         claim = KnowledgeForParser(propositionId=str(uuid.uuid1()), sentenceId=str(uuid.uuid1()), knowledge = knowledge1)
-        input = InputSentenceForParser(premise=[], claim=[claim])
+        input = InputSentenceForParser(premise=[], claim=[claim], actionModeType=ActionModeType.UNSPECIFIED.value)
 
         response = client.post("/analyze",
                             headers={"Content-Type": "application/json", "X_TOPOSOID_TRANSVERSAL_STATE": transversalState},
@@ -387,7 +387,7 @@ def test_IrregularLongSentence2():
     try:
         knowledge1 = Knowledge(sentence = "All notices hereunder and communications regarding interpretation of the terms of this Agreement and changes thereto, shall be effected by the mailing thereof by registered or certified mail, return receipt requested, postage prepaid, and addressed as follows: CONSULTANT: __________(CONSULTANT)_______________ __________(NAME)________, Project Manager  __________(ADDRESS)____________________ COMMISSION: Santa Cruz County Regional Transportation Commission (SCCRTC)  Luis Mendez, Contract Manager 1523 Pacific Ave, Santa Cruz, CA 95060", lang = "en_US", extentInfoJson = "{}")
         claim = KnowledgeForParser(propositionId=str(uuid.uuid1()), sentenceId=str(uuid.uuid1()), knowledge = knowledge1)
-        input = InputSentenceForParser(premise=[], claim=[claim])
+        input = InputSentenceForParser(premise=[], claim=[claim], actionModeType=ActionModeType.UNSPECIFIED.value)
 
         response = client.post("/analyze",
                             headers={"Content-Type": "application/json", "X_TOPOSOID_TRANSVERSAL_STATE": transversalState},
@@ -402,7 +402,7 @@ def test_IrregularLongSentence3():
     try:
         knowledge1 = Knowledge(sentence = "G.CONSULTANT shall not exceed milestone cost estimates as shown in Exhibit B, except with the prior written approval of the Contract Manager.", lang = "en_US", extentInfoJson = "{}")
         claim = KnowledgeForParser(propositionId=str(uuid.uuid1()), sentenceId=str(uuid.uuid1()), knowledge = knowledge1)
-        input = InputSentenceForParser(premise=[], claim=[claim])
+        input = InputSentenceForParser(premise=[], claim=[claim], actionModeType=ActionModeType.UNSPECIFIED.value)
 
         response = client.post("/analyze",
                             headers={"Content-Type": "application/json", "X_TOPOSOID_TRANSVERSAL_STATE": transversalState},
