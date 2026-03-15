@@ -16,9 +16,9 @@
 
 import spacy
 #from _model import KnowledgeForParser, KnowledgeBaseNode, LocalContext, PredicateArgumentStructure, KnowledgeBaseEdge, AnalyzedSentenceObject, DeductionResult, LocalContextForFeature, KnowledgeBaseSemiGlobalNode, CoveredPropositionResult, CoveredPropositionEdge
-from ToposoidCommon.model import KnowledgeForParser, KnowledgeBaseNode, LocalContext, PredicateArgumentStructure, KnowledgeBaseEdge, AnalyzedSentenceObject, DeductionResult, LocalContextForFeature, KnowledgeBaseSemiGlobalNode, CoveredPropositionResult, CoveredPropositionEdge
+from ToposoidCommon.model import KnowledgeForParser, KnowledgeBaseNode, LocalContext, PredicateArgumentStructure, KnowledgeBaseEdge, AnalyzedSentenceObject, DeductionResult, LocalContextForFeature, KnowledgeBaseSemiGlobalNode
 from NamedEntityRecognition import NamedEntityRecognition
-from ToposoidCommon import CaseGroupType, SentenceType
+from ToposoidCommon import CaseGroupType, SentenceType, AuthenticityType
 import re
 import os
 
@@ -155,7 +155,12 @@ class SentenceParser():
             localContextForFeature = localContextForFeature,            
         )
 
-        defaultDeductionResult = DeductionResult(status=False, coveredPropositionResults = [])
+        defaultDeductionResult = DeductionResult(
+            status=False, 
+            authenticityType= AuthenticityType.UNKNOWN.value,
+            coveredPropositionResults = [],
+            evidenceKnowledgeList=[]
+        )
         aso = AnalyzedSentenceObject(nodeMap=nodeMap, edgeList=edgeList, knowledgeBaseSemiGlobalNode=knowledgeBaseSemiGlobalNode, deductionResult=defaultDeductionResult)
         return aso
 
