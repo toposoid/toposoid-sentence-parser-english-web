@@ -158,7 +158,7 @@ class SentenceParser():
         defaultDeductionResult = DeductionResult(
             status=False, 
             authenticityType= AuthenticityType.UNKNOWN.value,
-            coveredPropositionResults = [],
+            coveredPropositionEdges = [],
             evidenceKnowledgeList=[]
         )
         aso = AnalyzedSentenceObject(nodeMap=nodeMap, edgeList=edgeList, knowledgeBaseSemiGlobalNode=knowledgeBaseSemiGlobalNode, deductionResult=defaultDeductionResult)
