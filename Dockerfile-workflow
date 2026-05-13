@@ -16,8 +16,7 @@ RUN apt-get update \
 && cd toposoid-sentence-parser-english-web \
 && git fetch origin ${TARGET_BRANCH} \
 && git checkout ${TARGET_BRANCH} \
-#&& sed s/__##GIT_BRANCH##__/${TARGET_BRANCH}/g pyproject.toml.template > pyproject.toml \
-&& if [ $(uname -m) = "aarch64" ]; then cat pyproject.toml.template | sed s/__##GIT_BRANCH##__/${TARGET_BRANCH}/g | sed s/__##ARM64##__/sys_platform == 'linux' and platform_machine == 'aarch64'/g > pyproject.toml; else cat pyproject.toml.template | sed s/__##GIT_BRANCH##__/${TARGET_BRANCH}/g | sed s/__##ARM64##__//g > pyproject.toml; fi
+&& sed s/__##GIT_BRANCH##__/${TARGET_BRANCH}/g pyproject.toml.template > pyproject.toml \
 && uv sync \
 && uv add git+https://github.com/toposoid/toposoid-python-lib.git@${TARGET_BRANCH}#egg=ToposoidCommon \
 && uv run -- spacy download ${PIPELINES_MODEL}
