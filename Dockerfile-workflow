@@ -4,7 +4,6 @@ WORKDIR /app
 ARG TARGET_BRANCH
 ARG PIPELINES_MODEL
 ENV DEPLOYMENT=local
-ENV UV_ARM_FIX=sys_platform == 'linux' and platform_machine == 'aarch64'
 
 SHELL ["/bin/bash", "-c"]
 
