@@ -5,17 +5,13 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
-    "blis==1.2.0",
     "fastapi[all]==0.112.0",
-    "numpy==1.21.4",
-    "pip>=26.0.1",
-    "pydantic==2.8.2",
+    "pip>=26.1.1",
     "pytest==8.0.2",
-    "spacy==3.8.4",
-    "spacy-loggers==1.0.1",
-    "typing-extensions==4.12.2",
-    "uvicorn[standard]==0.15.0",
-    "wheel==0.37.0",
+    "spacy==3.8.5",
+    "toposoid-python-lib",
+    "uvicorn[standard]>=0.46.0",
+    "wheel>=0.47.0",
 ]
 
 [tool.uv.sources]
