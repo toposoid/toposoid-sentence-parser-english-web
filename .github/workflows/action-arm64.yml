@@ -36,9 +36,9 @@ jobs:
         with:
           context: .
           push: true
-          tags: toposoid/${{ env.PJ_REPO }}:${{ env.PJ_VERSION }}
+          tags: toposoid/${{ env.PJ_REPO }}:${{ env.PJ_VERSION }}-arm64
           build-args: |
-            TARGET_BRANCH=${{ env.PJ_BRANCH }}-arm64
+            TARGET_BRANCH=${{ env.PJ_BRANCH }}
             PIPELINES_MODEL=en_core_web_lg
       - name: Build And Push Docker Image For Test
         uses: docker/build-push-action@v5
