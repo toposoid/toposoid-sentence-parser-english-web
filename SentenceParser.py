@@ -156,7 +156,6 @@ class SentenceParser():
         )
 
         defaultDeductionResult = DeductionResult(
-            status=False, 
             authenticityType= AuthenticityType.INSUFFICIENT.value,
             coveredPropositionEdges = [],
             evidenceKnowledgeList=[]
